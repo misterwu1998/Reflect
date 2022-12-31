@@ -4,6 +4,7 @@
 #include "util/Singleton.hpp"
 #include <unordered_map>
 #include <string>
+#include "reflect/Field.hpp"
 
 class reflect_Obj;
 
@@ -13,6 +14,11 @@ private:
 
   /// <类名, 类的无参构造函数>
   std::unordered_map<std::string, reflect_Obj* (*)(void)> defaultConstructors;
+
+  std::unordered_map<
+    std::string,
+    std::unordered_map<std::string, reflect_Field>
+  > fields;
 
 public:
 
@@ -28,6 +34,20 @@ public:
   /// @param className 
   /// @return 类的无参构造函数，或NULL表示这个类还未注册无参构造函数
   reflect_Obj* (*getConstructor(std::string const& className))(void);
+
+  /// @brief 
+  /// @param className 
+  /// @param fieldName 
+  /// @param field 
+  /// @return 1表示新增，0表示覆盖，负数表示出错
+  int registerField(std::string const& className, std::string const& fieldName, reflect_Field const& field);
+  
+  /// @brief 
+  /// @param className 
+  /// @param fieldName 
+  /// @param field 
+  /// @return 1表示成功获取，0表示未注册，负数表示出错
+  int getField(std::string const& className, std::string const& fieldName, reflect_Field& field);
 
 QuickSingleton_epilogue
 
