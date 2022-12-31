@@ -6,7 +6,7 @@
 class reflect_Obj;
 class reflect_Field;
 
-/// @brief 要实现“静态代码块”，可借助静态变量的构造函数
+/// @brief 这个类是C++反射库的精髓，实现了“静态代码块”。其原理就是任意源文件中定义的全局对象都需要在main()之前初始化，没指定构造函数的话无参构造函数就会被调用，有指定构造函数的话，我们想在main()之前干啥就都可以在那个构造函数里边完成了
 class reflect_Registeraction
 {
 public:
