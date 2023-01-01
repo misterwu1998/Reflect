@@ -30,6 +30,10 @@ int main(int argc, char const *argv[])
   id = obj->callFunc<int, std::string const&>("getId", std::string("abc"));//有返回值
   obj->callPro<double>("shout", 114.514);//无返回值
   obj->callPro("shout", 114.514);//不那么复杂的形参就不必指明类型了，让编译器猜
+  obj->callPro("shout", 114514);//能不能猜到double？不行，最后传给成员函数的是0
+  obj->callPro<double&&>("shout", 1919.81);//这个也会导致传给成员函数的实参是0。这也是为什么callFunc()和callPro()不使用万能引用，因为参数类型需要尽可能简明、准确，如果用户有指定，那指定什么就得是什么，使用万能引用的话，指定double实际仍有可能是double&&
+  id = 0;
+  id = obj->callFunc<int>("getId", std::string("shit"));//虽然内部的_Func的形参是(_This const, std::string)型的，但也成功把字符串传给成员函数getId()的std::string const&形参了
   
   delete obj;
 
