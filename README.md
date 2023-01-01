@@ -1,4 +1,14 @@
 # 破产版 C++ 反射库
+## build
+CMake四步；链接库即产物`./build/libReflect.so`。
+```cmake
+mkdir build
+cd build
+cmake ..
+make
+```
+这个的`CMakeLists.txt`很简单，随便改。<br>
+头文件主要在[reflect/](./include/reflect/)；[util/](./include/util/)也带上（其实只有个单例宏）。
 ## 使用
 可参照[test目录](./test)下的几个文件。<br>
 1. 让被反射的类`Foo`继承自`reflect_Obj`; 需要包含[Obj.hpp](./include/reflect/Obj.hpp)。
