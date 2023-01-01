@@ -4,6 +4,7 @@
 #include <string>
 #include "reflect/Registry.hpp"
 #include "reflect/Field.hpp"
+#include "reflect/Method.hpp"
 
 class reflect_Obj
 {
@@ -37,6 +38,28 @@ public:
       *((FieldType *)(((void*)this) + offset)) = value;
       return 1;
     }else return 0;
+  }
+
+  template <typename RetType, typename ... ArgTypes> RetType callFunc(std::string const& methodName, ArgTypes&& ... args){
+    reflect_Method method;
+    auto ret = reflect_Registry::get().getMethod(__className, methodName, method);
+    if(1==ret){
+      using _This = decltype(this);
+      using _Func = RetType (*)(_This const, ArgTypes ...);
+      _Func f = (_Func)(method.getFunctor());
+      return (RetType)(f(this, std::forward<ArgTypes>(args)...));
+    }
+  }
+
+  template <typename ... ArgTypes> void callPro(std::string const& methodName, ArgTypes&& ... args){
+    reflect_Method method;
+    auto ret = reflect_Registry::get().getMethod(__className, methodName, method);
+    if(1>ret) return;
+    using _This = decltype(this);
+    using _Func = void (*)(_This const, ArgTypes ...);
+    _Func f = (_Func)(method.getFunctor());
+    f(this, std::forward<ArgTypes>(args)...);
+    return;
   }
 
 };

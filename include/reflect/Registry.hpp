@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include "reflect/Field.hpp"
+#include "reflect/Method.hpp"
 
 class reflect_Obj;
 
@@ -19,6 +20,11 @@ private:
     std::string,
     std::unordered_map<std::string, reflect_Field>
   > fields;
+
+  std::unordered_map<
+    std::string,
+    std::unordered_map<std::string, reflect_Method>
+  > methods;
 
 public:
 
@@ -48,6 +54,20 @@ public:
   /// @param field 
   /// @return 1表示成功获取，0表示未注册，负数表示出错
   int getField(std::string const& className, std::string const& fieldName, reflect_Field& field);
+
+  /// @brief 
+  /// @param className 
+  /// @param methodName 
+  /// @param method 
+  /// @return 1表示新增，0表示覆盖，负数表示出错
+  int registerMethod(std::string const& className, std::string const& methodName, reflect_Method const& method);
+
+  /// @brief 
+  /// @param className 
+  /// @param methodName 
+  /// @param method
+  /// @return 1表示成功获取，0表示未注册，负数表示出错
+  int getMethod(std::string const& className, std::string const& methodName, reflect_Method& method);
 
 QuickSingleton_epilogue
 

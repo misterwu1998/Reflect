@@ -10,3 +10,8 @@ reflect_Registeraction::reflect_Registeraction(std::string const& className, std
   auto& r = reflect_Registry::get();
   r.registerField(className,fieldName,field);
 }
+
+reflect_Registeraction::reflect_Registeraction(std::string const& className, std::string const& methodName, reflect_Method const& method){
+  auto& r = reflect_Registry::get();
+  r.registerMethod(className,methodName,method);
+}

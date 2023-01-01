@@ -44,3 +44,25 @@ int reflect_Registry::getField(std::string const& className, std::string const& 
   field = fields[className][fieldName];
   return 1;
 }
+
+int reflect_Registry::registerMethod(std::string const& className, std::string const& methodName, reflect_Method const& method){
+  if(methods.count(className)<1){
+    methods.insert({
+      className,
+      std::unordered_map<std::string, reflect_Method>()
+    });
+  }
+  if(methods[className].count(methodName)<1){
+    methods[className].insert({methodName,method});
+    return 1;
+  }else{
+    methods[className][methodName] = method;
+    return 0;
+  }
+}
+
+int reflect_Registry::getMethod(std::string const& className, std::string const& methodName, reflect_Method& method){
+  if(methods.count(className)<1 || methods[className].count(methodName)<1) return 0;
+  method = methods[className][methodName];
+  return 1;
+}
