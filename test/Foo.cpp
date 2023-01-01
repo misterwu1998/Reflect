@@ -1,7 +1,5 @@
 #include "./Foo.hpp"
 #include "reflect/Registeraction.hpp"
-#include "reflect/Registry.hpp"
-#include "reflect/Field.hpp"
 #include <iostream>
 
 Foo::Foo():id(114514){}
