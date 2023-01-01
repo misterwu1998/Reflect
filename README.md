@@ -1,7 +1,7 @@
 # 破产版 C++ 反射库
 ## 使用
 可参照[test目录](./test)下的几个文件。<br>
-1. 让被反射的类继承`Foo`自`reflect_Obj`; 需要包含[Obj.hpp](./include/reflect/Obj.hpp)。
+1. 让被反射的类`Foo`继承自`reflect_Obj`; 需要包含[Obj.hpp](./include/reflect/Obj.hpp)。
 2. 在`Foo`的头文件中定义成员变量，声明成员函数；在`Foo`的源文件中定义成员函数；注意，必须保留`Foo`的无参构造函数。
 3. 在`Foo`的源文件中使用宏，为`Foo`注册无参构造函数、成员变量、成员函数；需要包含[Registeraction.hpp](./include/reflect/Registeraction.hpp)
 4. 根据字符串获取某类的对象实例<br>
