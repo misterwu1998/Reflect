@@ -4,6 +4,7 @@
 #include "util/Singleton.hpp"
 #include <unordered_map>
 #include <string>
+#include <memory>
 #include "reflect/Field.hpp"
 #include "reflect/Method.hpp"
 
@@ -14,7 +15,7 @@ QuickSingleton_prologue(reflect_Registry)
 private:
 
   /// <类名, 类的无参构造函数>
-  std::unordered_map<std::string, reflect_Obj* (*)(void)> defaultConstructors;
+  std::unordered_map<std::string, std::shared_ptr<reflect_Obj> (*)(void)> defaultConstructors;
 
   std::unordered_map<
     std::string,
@@ -33,13 +34,13 @@ public:
 
   /// @brief 注册一个类的无参构造函数
   /// @param className 
-  /// @param constructor 无参数、返回 reflect_Obj* 型的函数
+  /// @param constructor 无参数、返回std::shared_ptr<reflect_Obj>型的函数
   /// @return 1表示新增，0表示覆盖，负数表示出错
-  int registerConstructor(std::string const& className, reflect_Obj* (*constructor)(void));
+  int registerConstructor(std::string const& className, std::shared_ptr<reflect_Obj> (*constructor)(void));
 
   /// @param className 
   /// @return 类的无参构造函数，或NULL表示这个类还未注册无参构造函数
-  reflect_Obj* (*getConstructor(std::string const& className))(void);
+  std::shared_ptr<reflect_Obj> (*getConstructor(std::string const& className))(void);
 
   /// @brief 
   /// @param className 

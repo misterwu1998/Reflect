@@ -11,6 +11,7 @@ public:
   Foo();
   int getId(std::string const& name);
   void shout(double d);
+  ~Foo();
 };
 
 #endif // _reflect_Foo_hpp

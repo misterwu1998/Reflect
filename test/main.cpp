@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
   id = 0;
   id = obj->callFunc<int>("getId", std::string("shit"));//虽然内部的_Func的形参是(_This const, std::string)型的，但也成功把字符串传给成员函数getId()的std::string const&形参了
   
-  delete obj;
+  // delete obj;已经改裸指针为shared_ptr
 
   return 0;
 }

@@ -2,6 +2,7 @@
 #define _reflect_Registeraction_hpp
 
 #include <string>
+#include <memory>
 
 class reflect_Obj;
 class reflect_Field;
@@ -16,7 +17,7 @@ public:
   /// @brief 动作1：注册构造函数
   /// @param className 
   /// @param constructor 
-  reflect_Registeraction(std::string const& className, reflect_Obj* (*constructor)(void));
+  reflect_Registeraction(std::string const& className, std::shared_ptr<reflect_Obj> (*constructor)(void));
 
   /// @brief 动作2：注册类成员变量
   /// @param className 
@@ -33,8 +34,10 @@ public:
 };
 
 #define REFLECT_REGISTER_CONSTRUCTOR(className)\
-reflect_Obj* __reflect_defaultConstruct_##className (){\
-  auto obj = static_cast<reflect_Obj*>(new className());\
+std::shared_ptr<reflect_Obj> __reflect_defaultConstruct_##className (){\
+  auto obj = std::static_pointer_cast<reflect_Obj,className>(\
+    std::make_shared<className>()\
+  );\
   obj->__className = #className;\
   return obj;\
 }\
