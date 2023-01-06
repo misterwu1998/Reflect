@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "reflect/Registry.hpp"
 
 class reflect_Obj;
 class reflect_Field;
@@ -17,19 +18,28 @@ public:
   /// @brief 动作1：注册构造函数
   /// @param className 
   /// @param constructor 
-  reflect_Registeraction(std::string const& className, std::shared_ptr<reflect_Obj> (*constructor)(void));
+  reflect_Registeraction(std::string const& className, std::shared_ptr<reflect_Obj> (*constructor)(void)){
+    auto& r = reflect_Registry::get();
+    r.registerConstructor(className,constructor);
+  }
 
   /// @brief 动作2：注册类成员变量
   /// @param className 
   /// @param fieldName 
   /// @param field 
-  reflect_Registeraction(std::string const& className, std::string const& fieldName, reflect_Field const& field);
+  reflect_Registeraction(std::string const& className, std::string const& fieldName, reflect_Field const& field){
+    auto& r = reflect_Registry::get();
+    r.registerField(className,fieldName,field);
+  }
 
   /// @brief 动作3：注册成员函数
   /// @param className 
   /// @param methodName 
   /// @param method 
-  reflect_Registeraction(std::string const& className, std::string const& methodName, reflect_Method const& method);
+  reflect_Registeraction(std::string const& className, std::string const& methodName, reflect_Method const& method){
+    auto& r = reflect_Registry::get();
+    r.registerMethod(className,methodName,method);
+  }
 
 };
 
