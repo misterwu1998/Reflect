@@ -5,6 +5,7 @@ include(CTest)
 enable_testing()
 
 include_directories(./include/)
+include_directories(../MyUtils/include/)
 
 # file(GLOB_RECURSE SOURCE_CPP ./src/*.cpp)
 # file(GLOB_RECURSE SOURCE_C ./src/*.c)
