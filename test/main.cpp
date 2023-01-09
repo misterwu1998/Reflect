@@ -1,22 +1,20 @@
-#include "reflect/Obj.hpp"
-#include "reflect/Registeraction.hpp"
-#include "reflect/Registry.hpp"
-#include "reflect/Field.hpp"
-#include "./Foo.hpp"
 #include <iostream>
+#include <string>
+#include "reflect/single_include.hpp"
+
+#include "./Foo.hpp"
 
 #define __test_memberFunctor 0
 
 int main(int argc, char const *argv[])
 {
-#if __test_memberFunctor
-  auto f = &Foo::getId;
-  auto v = (void*)f;//类成员函数指针也可以类型擦除
-  Foo abc;
-  typedef int (*Functor_i_s)(Foo* const, std::string const&);
-  Functor_i_s fff = (Functor_i_s)v;
-  int ret = fff(&abc, "abc");
-#endif
+  auto obj = reflect_new("adsnflasknf",114514);
+  obj = reflect_new("Foo", 114514);
+  obj = reflect_new("Foo", "田所浩二");
+  obj = reflect_new<std::string>("Foo", "田所浩二");
+  obj = reflect_new("Foo", std::string("abc"));
+
+#if 0 //旧版，非类型安全
 
   auto obj = reflect_Registry::get().getConstructor("Foo")();
   
@@ -36,6 +34,17 @@ int main(int argc, char const *argv[])
   id = obj->callFunc<int>("getId", std::string("shit"));//虽然内部的_Func的形参是(_This const, std::string)型的，但也成功把字符串传给成员函数getId()的std::string const&形参了
   
   // delete obj;已经改裸指针为shared_ptr
+
+#endif //旧版，非类型安全
+
+#if __test_memberFunctor
+  auto f = &Foo::getId;
+  auto v = (void*)f;//类成员函数指针也可以类型擦除
+  Foo abc;
+  typedef int (*Functor_i_s)(Foo* const, std::string const&);
+  Functor_i_s fff = (Functor_i_s)v;
+  int ret = fff(&abc, "abc");
+#endif
 
   return 0;
 }

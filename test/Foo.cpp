@@ -1,3 +1,5 @@
+#if 0 //旧版，非类型安全
+
 #include "./Foo.hpp"
 #include "reflect/Registeraction.hpp"
 #include <iostream>
@@ -24,3 +26,5 @@ REFLECT_REGISTER_FIELD(Foo,id)
 REFLECT_REGISTER_FIELD(Foo,name)
 REFLECT_REGISTER_METHOD(Foo,getId);
 REFLECT_REGISTER_METHOD(Foo,shout);
+
+#endif //旧版，非类型安全

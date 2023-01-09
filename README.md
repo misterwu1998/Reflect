@@ -39,7 +39,7 @@ unordered_map<
   Ptr<Obj> (*)(void)/*无参构造函数*/> constructors;
 ```
 然后借助`RegisterAction_*`静态对象的构造函数，在`main()`之前把键值对注册上去；利用宏定义缩短用户代码；这种办法其它映射也效仿。<br>
-需要注意的是，如果要允许用户在被反射类`Foo`的头文件`Foo.hpp`中就完成注册，而无需担心`Foo.hpp`被多个源文件include造成`RegisterAction_*`静态对象重复定义，那么`RegisterAction_*`应当定义为单例，重复调用其`getSingleton(string const& className, Ptr<Obj> (*constructor)())`也不会重复注册。
+需要注意的是，如果要允许用户在被反射类`Foo`的头文件`Foo.hpp`中就完成注册，而无需担心`Foo.hpp`被多个源文件include造成`RegisterAction_*`对象重复定义，~~那么`RegisterAction_*`应当定义为单例，重复调用其`getSingleton(string const& className, Ptr<Obj> (*constructor)())`也不会重复注册。~~（没关系，重复就重复，给`RegisterAction_*`对象加`static`完事）
 ## 映射3、映射4
 一开始想到的是
 ```cpp
@@ -94,7 +94,6 @@ public:
 有了映射5、映射6的经验，有参构造方法也能搞定了，映射1、映射2扩展为：
 - 有效的 {Ts..., "ClassName"} -> 已初始化的对象 obj
 - 无效的 {Ts..., "ClassName"} -> nullptr
-
 ```cpp
 template <typename ... Ts>
 class ClassRegistry{
@@ -104,3 +103,7 @@ public:
     Ptr<Obj> (*)(Ts...)/*任意参数构造函数*/>* classes;
 };
 ```
+相应地，单例`RegisterAction_*`也套上`template <typename ... Ts>`。
+
+# 实现
+具体实现可能和[设计](#设计)部分预想的有出入。
