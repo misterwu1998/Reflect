@@ -1,9 +1,14 @@
 #if !defined(_reflect_FieldRegistry_hpp)
 #define _reflect_FieldRegistry_hpp
 
+#define _REFLECT_DEBUG 1
+
 #include <unordered_map>
 #include <memory>
 #include <string>
+#if _REFLECT_DEBUG
+  #include <iostream>
+#endif
 #include "reflect/detail/field/Field.hpp"
 
 class reflect_Obj;
@@ -15,7 +20,15 @@ class _reflect_FieldRegistry
     std::string/*类名*/,
     std::unordered_map<
       std::string/*域名*/,
-      _reflect_Field>>* fields;
+      _reflect_Field>>& getMap()
+  {
+    static std::unordered_map<
+      std::string/*类名*/,
+      std::unordered_map<
+        std::string/*域名*/,
+        _reflect_Field>> fields;
+    return fields;
+  }
 
 public:
 
@@ -24,13 +37,11 @@ public:
     std::string const& fieldName,
     _reflect_Field const& field
   ){
-    if(NULL==fields)
-      fields = new std::unordered_map<
-        std::string/*类名*/,
-        std::unordered_map<
-          std::string/*域名*/,
-          _reflect_Field>>;
-    (*fields)[className][fieldName] = field;
+    auto& fields = getMap();
+    fields[className][fieldName] = field;
+#if _REFLECT_DEBUG
+    std::cout << "_reflect_FieldRegistry::set(): register " << className << "::" << fieldName << std::endl;
+#endif
   }
 
   /// @brief 
@@ -43,10 +54,9 @@ public:
     std::string const& fieldName,
     _reflect_Field& field)
   {
-    if(NULL==fields)
-      return 0;
-    auto itc = fields->find(className);
-    if(fields->end()==itc)
+    auto& fields = getMap();
+    auto itc = fields.find(className);
+    if(fields.end()==itc)
       return 0;
     auto& c = itc->second;
     auto itf = c.find(fieldName);
@@ -58,11 +68,6 @@ public:
 
 };
 
-template <typename FieldType>
-std::unordered_map<
-  std::string/*类名*/,
-  std::unordered_map<
-    std::string/*域名*/,
-    _reflect_Field>>* _reflect_FieldRegistry<FieldType>::fields = NULL;
+#undef _REFLECT_DEBUG
 
 #endif // _reflect_FieldRegistry_hpp

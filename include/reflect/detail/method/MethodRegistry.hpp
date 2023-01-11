@@ -1,9 +1,14 @@
 #if !defined(_reflect_MethodRegistry_hpp)
 #define _reflect_MethodRegistry_hpp
 
+#define _REFLECT_DEBUG 1
+
 #include <memory>
 #include <unordered_map>
 #include <string>
+#if _REFLECT_DEBUG
+  #include <iostream>
+#endif
 
 #include "reflect/detail/method/Method.hpp"
 
@@ -16,7 +21,15 @@ class _reflect_MethodRegistry
     std::string/*类名*/,
     std::unordered_map<
       std::string/*方法名*/,
-      _reflect_Method>>* methods;
+      _reflect_Method>>& getMap()
+  {
+    static std::unordered_map<
+      std::string/*类名*/,
+      std::unordered_map<
+        std::string/*方法名*/,
+        _reflect_Method>> methods;
+    return methods;
+  }
 
 public:
 
@@ -25,13 +38,11 @@ public:
     std::string const& methodName,
     _reflect_Method const& method
   ){
-    if(NULL==methods)
-      methods = new std::unordered_map<
-        std::string/*类名*/,
-        std::unordered_map<
-          std::string/*方法名*/,
-          _reflect_Method>>;
-    (*methods)[className][methodName] = method;
+    auto& methods = getMap();
+    methods[className][methodName] = method;
+#if _REFLECT_DEBUG
+    std::cout << "_reflect_MethodRegistry::set(): register " << className << "::" << methodName << "()" << std::endl;
+#endif
   }
 
   /// @brief 
@@ -44,10 +55,9 @@ public:
     std::string const& methodName,
     _reflect_Method& method
   ){
-    if(NULL==methods)
-      return 0;
-    auto itc = methods->find(className);
-    if(methods->end()==itc)
+    auto& methods = getMap();
+    auto itc = methods.find(className);
+    if(methods.end()==itc)
       return 0;
     auto& c = itc->second;
     auto itm = c.find(methodName);
@@ -58,12 +68,5 @@ public:
   }
 
 };
-
-template <typename ReturnType, typename ... ArgTypes>
-std::unordered_map<
-  std::string/*类名*/,
-  std::unordered_map<
-    std::string/*方法名*/,
-    _reflect_Method>>* _reflect_MethodRegistry<ReturnType, ArgTypes...>::methods = NULL;
 
 #endif // _reflect_MethodRegistry_hpp

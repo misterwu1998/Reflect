@@ -5,14 +5,68 @@
 #include "./Foo.hpp"
 
 #define __test_memberFunctor 0
+#define __test_templateVoidArg 0
+
+#if __test_templateVoidArg
+template <typename T, typename ... Ts> struct TTT{
+  using RT = T (*)(Ts...);
+};
+#endif
 
 int main(int argc, char const *argv[])
 {
-  auto obj = reflect_new("adsnflasknf",114514);
-  obj = reflect_new("Foo", 114514);
-  obj = reflect_new("Foo", "田所浩二");
-  obj = reflect_new<std::string>("Foo", "田所浩二");
-  obj = reflect_new("Foo", std::string("abc"));
+  int ret;
+  reflect_Ptr obj;
+  int id;
+  std::string name;
+  int* (*ptr)(std::unique_ptr<float>);
+
+  obj = reflect_new/*<>*/("unknown");
+  obj = reflect_new<int&&>("unknown",114514);//int&&型应当注册了Foo::Foo()，而没有unknown
+  obj = reflect_new<int, std::string&&>("null", 114514,"田所");//同上
+  obj = reflect_new/*<>*/("Foo");
+  obj = reflect_new/*<int>*/("Foo",114514);//nullptr
+  obj = reflect_new<int&&>("Foo",114514);
+  obj = reflect_new<std::string const&>("Foo","田所");
+  obj = reflect_new/* <int, char const*> */("Foo", 114514,"foo");
+
+  ret = obj->get("id",id);
+  ret = obj->set("id",1919810);
+  ret = obj->get("id",id);
+  ret = obj->get("name",name);
+  // ret = obj->set/*<char const*>*/("name","王爷");//编译在赋值语句处报错：invalid array assignment
+  ret = obj->set<std::string>("name","王爷");//ok
+  ret = obj->get("name",name);
+  ret = obj->get("unknown",id);
+  ret = obj->get("unknown",name);
+  ret = obj->set("unknown",123);
+  ret = obj->set("unknown", std::string("nobody"));
+
+  ret = obj->pro("nothing");
+  ret = obj->pro/* <double> */("shout",114.514);
+  ret = obj->pro("unknown");
+  ret = obj->pro/* <double> */("unknown",114.514);
+  ret = obj->pro<double&&>("shout", 114.514);//0
+
+  ret = obj->func("getId",id);
+  ret = obj->func
+    < decltype(ptr),  std::string, 
+        Foo&&>("unknown",   
+      ptr,            "reflect!",  
+        Foo{42,"答案"});
+  ret = obj->func("unknown",id);//0
+  ret = obj->func("getId", name);//0
+  ret = obj->func
+    < decltype(ptr),  std::string, 
+        Foo&&>("unknown",   
+      ptr,            "reflect!",  
+        Foo{42,"答案"});
+
+  return 0;
+
+#if __test_templateVoidArg
+  TTT<void>::RT f;
+#endif
 
 #if 0 //旧版，非类型安全
 
@@ -45,6 +99,4 @@ int main(int argc, char const *argv[])
   Functor_i_s fff = (Functor_i_s)v;
   int ret = fff(&abc, "abc");
 #endif
-
-  return 0;
 }

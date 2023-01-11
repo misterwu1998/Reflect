@@ -24,10 +24,10 @@ public:
   }
 };
 
-/// 为了同时注册多个构造函数，用户需要随便提供一个唯一的constructorNickname作区分
-#define REFLECT_REGISTER_CONSTRUCTOR(Class, constructorNickname, ...) \
+/// 为了同时注册多个构造函数，用户需要随便提供一个唯一的_constructorNickname作区分
+#define REFLECT_REGISTER_CONSTRUCTOR(Class, _constructorNickname, ...) \
 static _reflect_ClassRegistration<__VA_ARGS__> \
-  _reflect_classRegistration_##Class##_##constructorNickname( \
+  _reflect_classRegistration_##Class##_##_constructorNickname( \
     #Class, \
     _reflect_Constructor<Class, ##__VA_ARGS__> \
   );

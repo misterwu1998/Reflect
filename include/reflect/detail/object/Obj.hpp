@@ -25,10 +25,10 @@ public:
   int get(std::string const& fieldName, FieldType& value)
   {
     _reflect_Field f;
-    if(_reflect_FieldRegistration<FieldType>::get(__className,fieldName,f))//有
+    if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
     {
       value = *(
-        (FieldType*)
+        (FieldType const*)
         (
           ((void*)this) +
           f.offset
@@ -48,7 +48,7 @@ public:
   int set(std::string const& fieldName, FieldType const& value)
   {
     _reflect_Field f;
-    if(_reflect_FieldRegistration<FieldType>::get(__className,fieldName,f))//有
+    if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
     {
       *(
         (FieldType*)
@@ -75,12 +75,12 @@ public:
     ReturnType& result,
     ArgTypes... args
   ){
-    using Func = ReturnType (*)(ArgTypes...);
+    using Func = ReturnType (*)(reflect_Obj* const, ArgTypes...);
     _reflect_Method m;
     if(_reflect_MethodRegistry<ReturnType, ArgTypes...>::get(__className,methodName,m))//有
     {
       auto f = (Func)m.getFunctor();
-      result = f(std::forward<ArgTypes>(args)...);
+      result = f(this, std::forward<ArgTypes>(args)...);
       return 1;
     }
     else return 0;
@@ -96,12 +96,12 @@ public:
     std::string const& methodName,
     ArgTypes... args
   ){
-    using Func = void (*)(ArgTypes...);
+    using Func = void (*)(reflect_Obj* const, ArgTypes...);
     _reflect_Method m;
     if(_reflect_MethodRegistry<void, ArgTypes...>::get(__className,methodName,m))//有
     {
       auto f = (Func)m.getFunctor();
-      f(std::forward<ArgTypes>(args)...);
+      f(this, std::forward<ArgTypes>(args)...);
       return 1;
     }
     else return 0;
@@ -117,9 +117,12 @@ inline reflect_Ptr reflect_new(
   ConstructorArgTypes... args
 ){
   auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get(className);
-  if(NULL==f)
-    return nullptr;
-  return f(std::forward<ConstructorArgTypes>(args)...);
+  if(f){
+    reflect_Ptr obj = f(std::forward<ConstructorArgTypes>(args)...);
+    obj->__className = className;
+    return obj;
+  }
+  return nullptr;
 }
 
 template <typename ... ConstructorArgTypes>
@@ -127,10 +130,9 @@ inline reflect_Ptr reflect_new(
   const char* className,
   ConstructorArgTypes... args
 ){
-  auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get(std::string(className));
-  if(NULL==f)
-    return nullptr;
-  return f(std::forward<ConstructorArgTypes>(args)...);
+  return reflect_new<ConstructorArgTypes...>(
+    std::string(className), 
+    std::forward<ConstructorArgTypes>(args)...);
 }
 
 #endif // _reflect_Obj_hpp

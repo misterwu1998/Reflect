@@ -21,6 +21,7 @@ public:
 #define REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Class, ...)\
 static Class _reflect_forRegistration_##Class (__VA_ARGS__);
 
+/// 【!】不允许注册引用型的成员
 #define REFLECT_REGISTER_FIELD_REGISTER(Class,field,FieldType) \
 static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class##_##field( \
   #Class, #field, \

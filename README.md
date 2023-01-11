@@ -14,7 +14,7 @@ T r = obj->funcName(Ts... as);//调用函数
 3. funcName 函数名称 + {Ts...} 参数列表
 4. T 函数返回值类型 <i>最迟也能在编译期知道；void 是一种特例</i>
 
-现在他们的局面是：以上大部分信息延迟获知。因此，反射需要额外准备一些与字符串相关的映射：
+现在他们的局面是，有很多信息延迟获知。因此，反射需要额外准备一些与字符串相关的映射：
 1. 有效的 "ClassName" -> 对象原型 obj
 2. 无效的 "ClassName" -> nullptr
 3. 有效的 {"ClassName","fieldName",FT} -> 读或写成员
@@ -31,6 +31,8 @@ T r = obj->funcName(Ts... as);//调用函数
 1. 代码侵入尽量轻微
 2. 在运行期进入`main()`之前构建完成
 3. 全局单例，全程不变
+
+最后的实现可能和预想的有出入，以代码和[使用部分](#使用)为准。
 ## 映射1、映射2
 不难想到：
 ```cpp
@@ -64,11 +66,11 @@ public:
     unordered_map<
       string/*域名*/,
       Field/*域无关于FT的属性封装类，
-        名称、偏移地址、尺寸等等*/>>* fields;
+        名称、偏移地址、尺寸等等*/>> fields;
   /*安全访问fields的其它静态函数*/...
 };
 ```
-fields设为指针能减小空fields的内存占用，即，有人要来注册了再new；另外，不必delete。<br>
+~~fields设为指针能减小空fields的内存占用，即，有人要来注册了再new；另外，不必delete。<br>~~
 库的使用者在编译前或编译期把 FT 传过来，于是`FieldRegistry<FT>`被模板实例化，与其它可能也被实例化的`FieldRegistry<int>`、`FieldRegistry<Foo>`啥的就完全隔离了。<br>
 `Obj::get()`和`Obj::set()`负责接收用户传达的 FT，问`FieldRegistry<FT>`要`Field`，要到了就说明注册了，否则就啥也不做。
 
@@ -84,7 +86,7 @@ public:
       string/*函数名*/,
       Method/*
         函数无关于RetType,ArgTypes的属性封装类，
-        好像只需记录地址*/>>* methods;
+        好像只需记录地址*/>> methods;
   /*安全访问methods的其它静态函数*/...
 };
 ```
@@ -100,10 +102,111 @@ class ClassRegistry{
 public:
   static unordered_map<
     string/*类名*/,
-    Ptr<Obj> (*)(Ts...)/*任意参数构造函数*/>* classes;
+    Ptr<Obj> (*)(Ts...)/*任意参数构造函数*/> classes;
 };
 ```
 相应地，单例`RegisterAction_*`也套上`template <typename ... Ts>`。
 
-# 实现
-具体实现可能和[设计](#设计)部分预想的有出入。
+## T, T&, T&&, T const&, T const
+引用型的成员变量不支持注册，所以`get()`,`set()`使用简单的模板参数，让编译器简单将`FieldType`视为值类型即可。但涉及可变参的构造函数、成员函数就比较麻烦。如果要让用户在反射调用成员函数（包括构造函数）时完全不需要费事去指定模板参数，那么反射库需要对参数列表中任意位置的函数参数实现以下映射：
+
+![如果允许反射调用函数时完全不需要指定模板参数……](invoke.png)
+
+这个我目前真不会……隐约感觉能通过什么办法递归展开Action类模板，实际为某类型的参数把相应的几个形式全注册上去？我想即使能实现，也会额外有很大开销，就暂时不寻找、学习这个问题的方案了。
+
+# 使用
+参考[test/](test/)下的例子。
+## 0. Include路径
+[reflect目录所在的目录](./include/)
+## 1. 头文件
+包含[single_include.hpp](include/reflect/single_include.hpp)即可。
+## 2. 继承`reflect_Obj`
+## 3. 注册
+借助以下宏定义完成。可以在头文件中注册，但建议在源文件中注册。
+### REFLECT_REGISTER_CONSTRUCTOR(反射类,昵称, 构造函数形参类型列表)
+```cpp
+REFLECT_REGISTER_CONSTRUCTOR(Foo, prototype)
+REFLECT_REGISTER_CONSTRUCTOR(Foo, rvInt,    int&&)
+REFLECT_REGISTER_CONSTRUCTOR(Foo, crStr,    std::string const&)
+REFLECT_REGISTER_CONSTRUCTOR(Foo, both,     int, const char*)
+```
+`昵称`仅用于区分可能被注册的多个构造函数，不能重复；随便起名即可。
+### REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(反射类, 构造函数实参列表)
+```cpp
+REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo)
+```
+或者
+```cpp
+REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo, 123)
+```
+或者
+```cpp
+REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo, "John")
+```
+或者
+```cpp
+REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo, 123,"John")
+```
+仅用于在注册类的域之前提供一个对象实例。
+### REFLECT_REGISTER_FIELD_REGISTER(反射类,域,值类型)
+```cpp
+REFLECT_REGISTER_FIELD_REGISTER(Foo,id,int)
+REFLECT_REGISTER_FIELD_REGISTER(Foo,name, std::string)
+```
+<b>仅支持值类型的成员变量的注册。</b>不要注册类的引用型成员。
+### REFLECT_REGISTER_METHOD(反射类,方法,形参类型列表)
+```cpp
+REFLECT_REGISTER_METHOD(Foo,getId,int)
+REFLECT_REGISTER_METHOD(Foo,shout,void,double)
+REFLECT_REGISTER_METHOD(Foo,nothing,void)
+REFLECT_REGISTER_METHOD(Foo,func, int* (*)(std::unique_ptr<float>), std::string, Foo&&)
+```
+
+## 4. 反射
+Tips. 如果不确定需不需要列出模板参数，就干脆都列出，或者看看IDE给出的模板参数推导结果是否符合实际。
+### reflect_Ptr
+即`std::shared_ptr<reflect_Obj>`。因此，不同的反射类之间需要避免循环引用。
+### reflect_new()
+- 如果要使用反射类的无参构造方法，或者这个构造方法的形参全部都是值类型，模板参数就不必指定。
+```cpp
+obj = reflect_new/*<int, char const*>*/("Foo", 123,"John");//指针也是值
+```
+- 如果构造方法的形参含有引用类型，模板参数就必须全部列出。
+```cpp
+obj = reflect_new<std::string const&>("Foo","John");
+```
+`reflect_new()`遇到[设计部分](#设计)所提到的“无效的”情况，将返回`nullptr`。
+### reflect_Obj::get()
+很多情况下，如果无需指定模板参数。
+```cpp
+int id;
+ret = obj->get("id",id);
+std::string name;
+ret = obj->get("name",name);
+```
+成功，返回1；遇到任何“无效的”情况，返回0。
+### reflect_Obj::set()
+```cpp
+ret = obj->set("id",123);
+```
+成功，返回1；遇到任何“无效的”情况，返回0。
+
+`set()`需要列出模板参数的情况就多一些，比如
+1. 假设`Foo::id`是`unsigned long`型，那么编译器默认推断123是`int`型就不吻合了
+2. 一些平时会隐式转换的类型，比如`std::string`，传字面量进去会推断为`char const*`
+### reflect_Obj::pro()
+调用没有返回值的成员方法。类似地，形参全部都是值类型时，模板参数就不必指定，其余时候都必须指定。
+```cpp
+ret = obj->pro/*<double>*/("shout",114.514);
+```
+成功，返回1；遇到任何“无效的”情况，返回0。
+### reflect_Obj::func()
+调用有返回值的成员方法。类似地，形参全部都是值类型时，模板参数就不必指定，其余时候都必须指定。
+```cpp
+int* (*ptr)(std::unique_ptr<float>);
+ret = obj->func("getId",id);
+ret = obj->func
+  < decltype(ptr),  std::string,  Foo&&        >("unknown",   
+    ptr,            "reflect!",   Foo{42,"答案"});
+```
+成功，返回1；遇到任何“无效的”情况，返回0。

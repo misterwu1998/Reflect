@@ -1,9 +1,14 @@
 #if !defined(_reflect_ClassRegistry_hpp)
 #define _reflect_ClassRegistry_hpp
 
+#define _REFLECT_DEBUG 1
+
 #include <memory>
 #include <unordered_map>
 #include <string>
+#if _REFLECT_DEBUG
+  #include <iostream>    
+#endif
 
 class reflect_Obj;
 
@@ -13,16 +18,23 @@ class reflect_Obj;
 template <typename ... ConstructorArgTypes>
 class _reflect_ClassRegistry
 {
-  /// @note 是否需要、是否可以上锁呢？目前我觉得没必要，但也不知道在main()之前使用锁会不会出问题
-  /// 我觉得没必要的理由是
-  /// 1. 没有见到任何记载表明全局对象的初始化会有资源竞争
-  /// 2. 注册完成后，private的classes应当是只读的，
-  ///     用户不应操作任何reflect_ClassRegistry<ConstructorArgTypes...>类的任何方法，
-  ///     如果用户在main()内还想使用，就得自己保护资源
   static std::unordered_map<
     std::string/*类名*/,
     std::shared_ptr<reflect_Obj> 
-      (*)(ConstructorArgTypes...)/*任意参数构造函数*/>* classes;
+      (*)(ConstructorArgTypes...)/*任意参数构造函数*/>& getMap()
+  {
+    /// @note 是否需要、是否可以上锁呢？目前我觉得没必要，但也不知道在main()之前使用锁会不会出问题
+    /// 我觉得没必要的理由是
+    /// 1. 没有见到任何记载表明全局对象的初始化会有资源竞争
+    /// 2. 注册完成后，private的classes应当是只读的，
+    ///     用户不应操作任何reflect_ClassRegistry<ConstructorArgTypes...>类的任何方法，
+    ///     如果用户在main()内还想使用，就得自己保护资源
+    static std::unordered_map<
+      std::string/*类名*/,
+      std::shared_ptr<reflect_Obj> 
+        (*)(ConstructorArgTypes...)/*任意参数构造函数*/> classes;
+    return classes;
+  }
 
 public:
 
@@ -34,33 +46,25 @@ public:
     std::shared_ptr<reflect_Obj>
       (*_func)(ConstructorArgTypes...)  )
   {
-    if(NULL==classes)
-      classes = new std::unordered_map<
-        std::string/*类名*/,
-        std::shared_ptr<reflect_Obj> 
-          (*)(ConstructorArgTypes...)/*任意参数构造函数*/>;
-    (*classes)[className] = _func;
+    getMap()[className] = _func;
+#if _REFLECT_DEBUG
+    std::cout << "_reflect_ClassRegistry::set(): register " << className << std::endl;
+#endif
   }
 
   /// @param className 
   /// @return 参数列表为Ts...的构造函数的指针；或者NULL表示未注册
   static std::shared_ptr<reflect_Obj> (*get(std::string const& className))(ConstructorArgTypes...)
   {
-    if(NULL==classes)
+    auto& classes = getMap();
+    auto i = classes.find(className);
+    if(classes.end()==i)
       return NULL;
-    auto it = classes->find(className);
-    if(classes->end()==it)
-      return NULL;
-    return it->second;
+    return i->second;
   }
   
 };
 
-template <typename ... ConstructorArgTypes>
-std::unordered_map<
-  std::string/*类名*/,
-  std::shared_ptr<reflect_Obj> 
-    (*)(ConstructorArgTypes...)/*任意参数构造函数*/
->* _reflect_ClassRegistry<ConstructorArgTypes...>::classes = NULL;
+#undef _REFLECT_DEBUG
 
 #endif // _reflect_ClassRegistry_hpp
