@@ -4,6 +4,8 @@
 
 #include "./Foo.hpp"
 
+#include "reflect/detail/class/normal.hpp"
+
 #define __test_memberFunctor 0
 #define __test_templateVoidArg 0
 
@@ -16,51 +18,83 @@ template <typename T, typename ... Ts> struct TTT{
 int main(int argc, char const *argv[])
 {
   int ret;
-  reflect_Ptr obj;
+  reflect_Obj* raw;
+  reflect_Ptr shared;
   int id;
   std::string name;
   int* (*ptr)(std::unique_ptr<float>);
 
-  obj = reflect_new/*<>*/("unknown");
-  obj = reflect_new<int&&>("unknown",114514);//int&&型应当注册了Foo::Foo()，而没有unknown
-  obj = reflect_new<int, std::string&&>("null", 114514,"田所");//同上
-  obj = reflect_new/*<>*/("Foo");
-  obj = reflect_new/*<int>*/("Foo",114514);//nullptr
-  obj = reflect_new<int&&>("Foo",114514);
-  obj = reflect_new<std::string const&>("Foo","田所");
-  obj = reflect_new/* <int, char const*> */("Foo", 114514,"foo");
+  raw = reflect_new/*<>*/("unknown");
+  if(raw) delete raw;
+  raw = reflect_new<int&&>("unknown",114514);//int&&型应当注册了Foo::Foo()，而没有unknown
+  if(raw) delete raw;
+  raw = reflect_new<int, std::string&&>("null", 114514,"田所");//同上
+  if(raw) delete raw;
+  raw = reflect_new/*<>*/("Foo");
+  if(raw) delete raw;
+  raw = reflect_new/*<int>*/("Foo",114514);//nullptr
+  if(raw) delete raw;
+  raw = reflect_new<int&&>("Foo",114514);
+  if(raw) delete raw;
+  raw = reflect_new<std::string const&>("Foo","田所");
+  if(raw) delete raw;
+  raw = reflect_new/* <int, char const*> */("Foo", 114514,"foo");
+  if(raw) delete raw;
 
-  ret = obj->get("id",id);
-  ret = obj->set("id",1919810);
-  ret = obj->get("id",id);
-  ret = obj->get("name",name);
-  // ret = obj->set/*<char const*>*/("name","王爷");//编译在赋值语句处报错：invalid array assignment
-  ret = obj->set<std::string>("name","王爷");//ok
-  ret = obj->get("name",name);
-  ret = obj->get("unknown",id);
-  ret = obj->get("unknown",name);
-  ret = obj->set("unknown",123);
-  ret = obj->set("unknown", std::string("nobody"));
+  shared = reflect_share/*<>*/("unknown");
+  shared = reflect_share<int&&>("unknown",114514);//int&&型应当注册了Foo::Foo()，而没有unknown
+  shared = reflect_share<int, std::string&&>("null", 114514,"田所");//同上
+  shared = reflect_share/*<>*/("Foo");
+  shared = reflect_share/*<int>*/("Foo",114514);//nullptr
+  shared = reflect_share<int&&>("Foo",114514);
+  shared = reflect_share<std::string const&>("Foo","田所");
+  shared = reflect_share/* <int, char const*> */("Foo", 114514,"foo");
 
-  ret = obj->pro("nothing");
-  ret = obj->pro/* <double> */("shout",114.514);
-  ret = obj->pro("unknown");
-  ret = obj->pro/* <double> */("unknown",114.514);
-  ret = obj->pro<double&&>("shout", 114.514);//0
+  ret = shared->get("id",id);
+  ret = shared->set("id",1919810);
+  ret = shared->get("id",id);
+  ret = shared->get("name",name);
+  // ret = shared->set/*<char const*>*/("name","王爷");//编译在赋值语句处报错：invalid array assignment
+  ret = shared->set<std::string>("name","王爷");//ok
+  ret = shared->get("name",name);
+  ret = shared->get("unknown",id);
+  ret = shared->get("unknown",name);
+  ret = shared->set("unknown",123);
+  ret = shared->set("unknown", std::string("nobody"));
 
-  ret = obj->func("getId",id);
-  ret = obj->func
-    < decltype(ptr),  std::string, 
-        Foo&&>("unknown",   
-      ptr,            "reflect!",  
-        Foo{42,"答案"});
-  ret = obj->func("unknown",id);//0
-  ret = obj->func("getId", name);//0
-  ret = obj->func
-    < decltype(ptr),  std::string, 
-        Foo&&>("unknown",   
-      ptr,            "reflect!",  
-        Foo{42,"答案"});
+  ret = shared->pro("nothing");
+  ret = shared->pro/* <double> */("shout",114.514);
+  ret = shared->pro("unknown");
+  ret = shared->pro/* <double> */("unknown",114.514);
+  ret = shared->pro<double&&>("shout", 114.514);//0
+
+  ret = shared->func("getId",id);
+  ret = shared->func
+    < decltype(ptr),  std::string,  Foo&&>("unknown",   
+      ptr,            "reflect!",   Foo{42,"答案"});
+  ret = shared->func("unknown",id);//0
+  ret = shared->func("getId", name);//0
+  ret = shared->func
+    < decltype(ptr),  std::string,  Foo&&>("unknown",   
+      ptr,            "reflect!",   Foo{42,"答案"});
+  
+  auto fields = shared->getFields();
+  for(auto& kv : *fields){
+    std::cout << kv.first << ": "
+              // << kv.second.name << "; "
+              << kv.second.offset << "; "
+              << kv.second.size << "; "
+              << kv.second.typeName << std::endl;
+  }
+
+  auto methods = shared->getMethods();
+  for(auto& kv: *methods){
+    std::cout << kv.first << ": "
+              // << kv.second.getName() << "; "
+              << kv.second.getRetTypeName() << "; "
+              << kv.second.getArgTypeNames() << "; "
+              << kv.second.getFunctor() << std::endl;
+  }
 
   return 0;
 

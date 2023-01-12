@@ -12,7 +12,7 @@
 
 #include "reflect/detail/method/Method.hpp"
 
-class _reflect_Method;
+class reflect_Method;
 
 template <typename ReturnType, typename ... ArgTypes>
 class _reflect_MethodRegistry
@@ -21,13 +21,13 @@ class _reflect_MethodRegistry
     std::string/*类名*/,
     std::unordered_map<
       std::string/*方法名*/,
-      _reflect_Method>>& getMap()
+      reflect_Method>>& getMap()
   {
     static std::unordered_map<
       std::string/*类名*/,
       std::unordered_map<
         std::string/*方法名*/,
-        _reflect_Method>> methods;
+        reflect_Method>> methods;
     return methods;
   }
 
@@ -36,7 +36,7 @@ public:
   static void set(
     std::string const& className,
     std::string const& methodName,
-    _reflect_Method const& method
+    reflect_Method const& method
   ){
     auto& methods = getMap();
     methods[className][methodName] = method;
@@ -53,7 +53,7 @@ public:
   static int get(
     std::string const& className,
     std::string const& methodName,
-    _reflect_Method& method
+    reflect_Method& method
   ){
     auto& methods = getMap();
     auto itc = methods.find(className);

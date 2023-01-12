@@ -24,7 +24,7 @@ public:
   template <typename FieldType>
   int get(std::string const& fieldName, FieldType& value)
   {
-    _reflect_Field f;
+    reflect_Field f;
     if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
     {
       value = *(
@@ -47,7 +47,7 @@ public:
   template <typename FieldType>
   int set(std::string const& fieldName, FieldType const& value)
   {
-    _reflect_Field f;
+    reflect_Field f;
     if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
     {
       *(
@@ -76,7 +76,7 @@ public:
     ArgTypes... args
   ){
     using Func = ReturnType (*)(reflect_Obj* const, ArgTypes...);
-    _reflect_Method m;
+    reflect_Method m;
     if(_reflect_MethodRegistry<ReturnType, ArgTypes...>::get(__className,methodName,m))//有
     {
       auto f = (Func)m.getFunctor();
@@ -97,7 +97,7 @@ public:
     ArgTypes... args
   ){
     using Func = void (*)(reflect_Obj* const, ArgTypes...);
-    _reflect_Method m;
+    reflect_Method m;
     if(_reflect_MethodRegistry<void, ArgTypes...>::get(__className,methodName,m))//有
     {
       auto f = (Func)m.getFunctor();
@@ -107,16 +107,54 @@ public:
     else return 0;
   }
 
+  std::unordered_map<
+    std::string/*域名*/,
+    reflect_Field> const* getFields()
+  {
+    return _reflect_normalRegistry::getFields(__className);
+  }
+  
+  std::unordered_map<
+    std::string/*方法名*/,
+    reflect_Method> const* getMethods()
+  {
+    return _reflect_normalRegistry::getMethods(__className);
+  }
+
 };
+
+template <typename ... ConstructorArgTypes>
+inline reflect_Obj* reflect_new(
+  std::string const& className,
+  ConstructorArgTypes... args
+){
+  auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get_new(className);
+  if(f){
+    reflect_Obj* obj = f(std::forward<ConstructorArgTypes>(args)...);
+    obj->__className = className;
+    return obj;
+  }
+  return NULL;
+}
+
+template <typename ... ConstructorArgTypes>
+inline reflect_Obj* reflect_new(
+  const char* className,
+  ConstructorArgTypes... args
+){
+  return reflect_new<ConstructorArgTypes...>(
+    std::string(className), 
+    std::forward<ConstructorArgTypes>(args)...);
+}
 
 using reflect_Ptr = std::shared_ptr<reflect_Obj>;
 
 template <typename ... ConstructorArgTypes>
-inline reflect_Ptr reflect_new(
+inline reflect_Ptr reflect_share(
   std::string const& className,
   ConstructorArgTypes... args
 ){
-  auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get(className);
+  auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get_make_shared(className);
   if(f){
     reflect_Ptr obj = f(std::forward<ConstructorArgTypes>(args)...);
     obj->__className = className;
@@ -126,11 +164,11 @@ inline reflect_Ptr reflect_new(
 }
 
 template <typename ... ConstructorArgTypes>
-inline reflect_Ptr reflect_new(
+inline reflect_Ptr reflect_share(
   const char* className,
   ConstructorArgTypes... args
 ){
-  return reflect_new<ConstructorArgTypes...>(
+  return reflect_share<ConstructorArgTypes...>(
     std::string(className), 
     std::forward<ConstructorArgTypes>(args)...);
 }

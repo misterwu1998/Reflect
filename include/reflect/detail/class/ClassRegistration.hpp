@@ -15,12 +15,14 @@ class _reflect_ClassRegistration
 public:
   /// @brief 注册名为className的类的构造器
   /// @param className 
-  /// @param _constructor 
+  /// @param _make_shared 
   _reflect_ClassRegistration(
     std::string const& className,
-    std::shared_ptr<reflect_Obj> (*_constructor)(ConstructorArgTypes...)
+    reflect_Obj* (*_new)(ConstructorArgTypes...),
+    std::shared_ptr<reflect_Obj> (*_make_shared)(ConstructorArgTypes...)
   ){
-    _reflect_ClassRegistry<ConstructorArgTypes...>::set(className,_constructor);
+    _reflect_ClassRegistry<ConstructorArgTypes...>::set(className,_new);
+    _reflect_ClassRegistry<ConstructorArgTypes...>::set(className,_make_shared);
   }
 };
 
@@ -29,7 +31,8 @@ public:
 static _reflect_ClassRegistration<__VA_ARGS__> \
   _reflect_classRegistration_##Class##_##_constructorNickname( \
     #Class, \
-    _reflect_Constructor<Class, ##__VA_ARGS__> \
+    _reflect_new<Class, ##__VA_ARGS__>, \
+    _reflect_make_shared<Class, ##__VA_ARGS__> \
   );
 
 #endif // _reflect_ClassRegistration_hpp 

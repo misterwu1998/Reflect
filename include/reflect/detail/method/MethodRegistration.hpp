@@ -2,6 +2,7 @@
 #define _reflect_MethodRegistration_hpp
 
 #include "reflect/detail/method/MethodRegistry.hpp"
+#include "reflect/detail/class/normal.hpp"
 
 template <typename ReturnType, typename ... ArgTypes>
 class _reflect_MethodRegistration
@@ -10,9 +11,10 @@ public:
   _reflect_MethodRegistration(
     std::string const& className,
     std::string const& methodName,
-    _reflect_Method const& method
+    reflect_Method const& method
   ){
     _reflect_MethodRegistry<ReturnType, ArgTypes...>::set(className,methodName,method);
+    _reflect_normalRegistry::set(className,methodName,method);
   }
 };
 
@@ -26,7 +28,7 @@ struct Foo{
 
 static _reflect_MethodRegistration<char> _reflect_methodRegistration_Foo_get(
   "Foo", "get",
-  _reflect_Method(
+  reflect_Method(
     (void*)(&Foo::get),
     "get"
   )
@@ -34,14 +36,14 @@ static _reflect_MethodRegistration<char> _reflect_methodRegistration_Foo_get(
 
 static _reflect_MethodRegistration<void> _reflect_methodRegistration_Foo_nothing(
   "Foo", "nothing",
-  _reflect_Method(
+  reflect_Method(
     (void*)(&Foo::nothing)
   )
 );
 
 static _reflect_MethodRegistration<void, double&&, const char*> _reflect_methodRegistration_Foo_pro(
   "Foo", "pro",
-  _reflect_Method(
+  reflect_Method(
     (void*)(&Foo::pro),
     "pro"
   )
@@ -52,7 +54,7 @@ static _reflect_MethodRegistration<
   std::string, Foo&&
 > _reflect_methodRegistration_Foo_func(
   "Foo", "func",
-  _reflect_Method(
+  reflect_Method(
     (void*)(&Foo::func),
     "func"
   )
@@ -63,9 +65,11 @@ static _reflect_MethodRegistration<
 static _reflect_MethodRegistration<ReturnType, ##__VA_ARGS__ > \
   _reflect_methodRegistration_##Class##_##method ( \
     #Class, #method, \
-    _reflect_Method( \
+    reflect_Method( \
       (void*)(&Class::method), \
-      #method \
+      #method, \
+      #ReturnType, \
+      #__VA_ARGS__ \
     ) \
   );
 

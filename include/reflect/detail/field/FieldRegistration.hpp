@@ -4,8 +4,9 @@
 #include <cstddef>
 
 #include "reflect/detail/field/FieldRegistry.hpp"
+#include "reflect/detail/class/normal.hpp"
 
-class _reflect_Field;
+class reflect_Field;
 
 template <typename FieldType>
 class _reflect_FieldRegistration
@@ -14,20 +15,22 @@ public:
   _reflect_FieldRegistration(
     std::string const& className,
     std::string const& fieldName,
-    _reflect_Field const& field
+    reflect_Field const& field
   ){
     _reflect_FieldRegistry<FieldType>::set(className,fieldName,field);
+    _reflect_normalRegistry::set(className,fieldName,field);
   }
 };
 
 /// 【!】不允许注册引用型的成员
-#define REFLECT_REGISTER_FIELD_REGISTER(Class,field,FieldType) \
+#define REFLECT_REGISTER_FIELD(Class,field,FieldType) \
 static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class##_##field( \
   #Class, #field, \
-  _reflect_Field( \
+  reflect_Field( \
     offsetof(Class,field), \
     sizeof(Class::field), \
-    #field \
+    #field, \
+    #FieldType \
   ) \
 );
 

@@ -1,7 +1,3 @@
-TODO 把同一个反射类的被注册的域、方法组织起来，提供遍历的方法。
-
----
-此前的破产版本明显是类型不安全的，需要借助模板元编程改进一下。
 # 引入
 库的使用者平时正常的调用：
 ```cpp
@@ -134,12 +130,13 @@ REFLECT_REGISTER_CONSTRUCTOR(Foo, crStr,    std::string const&)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, both,     int, const char*)
 ```
 `昵称`仅用于区分可能被注册的多个构造函数，不能重复；随便起名即可。
-### REFLECT_REGISTER_FIELD_REGISTER(反射类,域,值类型)
+### REFLECT_REGISTER_FIELD(反射类,域,值类型)
 ```cpp
-REFLECT_REGISTER_FIELD_REGISTER(Foo,id,int)
-REFLECT_REGISTER_FIELD_REGISTER(Foo,name, std::string)
+REFLECT_REGISTER_FIELD(Foo,id,int)
+REFLECT_REGISTER_FIELD(Foo,name, std::string)
 ```
 <b>仅支持值类型的成员变量的注册。</b>不要注册类的引用型成员。
+
 ### REFLECT_REGISTER_METHOD(反射类,方法,形参类型列表)
 ```cpp
 REFLECT_REGISTER_METHOD(Foo,getId,int)
@@ -152,7 +149,8 @@ REFLECT_REGISTER_METHOD(Foo,func, int* (*)(std::unique_ptr<float>), std::string,
 Tips. 如果不确定需不需要列出模板参数，就干脆都列出，或者看看IDE给出的模板参数推导结果是否符合实际。
 ### reflect_Ptr
 即`std::shared_ptr<reflect_Obj>`。因此，不同的反射类之间需要避免循环引用。
-### reflect_new()
+### reflect_new(), reflect_share()
+分别返回`reflect_Obj*`, `reflect_Ptr`。
 - 如果要使用反射类的无参构造方法，或者这个构造方法的形参全部都是值类型，模板参数就不必指定。
 ```cpp
 obj = reflect_new/*<int, char const*>*/("Foo", 123,"John");//指针也是值
@@ -196,3 +194,5 @@ ret = obj->func
     ptr,            "reflect!",   Foo{42,"答案"});
 ```
 成功，返回1；遇到任何“无效的”情况，返回0。
+### reflect_Obj::getFields(), reflect_Obj::getMethods()
+获取被注册的域和方法。这里不考虑序列化、JSON化、XML化之类的问题，仅提供无关于类型的reflect_Field、reflect_Method的遍历途径。

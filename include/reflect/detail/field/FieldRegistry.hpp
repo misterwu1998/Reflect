@@ -20,13 +20,13 @@ class _reflect_FieldRegistry
     std::string/*类名*/,
     std::unordered_map<
       std::string/*域名*/,
-      _reflect_Field>>& getMap()
+      reflect_Field>>& getMap()
   {
     static std::unordered_map<
       std::string/*类名*/,
       std::unordered_map<
         std::string/*域名*/,
-        _reflect_Field>> fields;
+        reflect_Field>> fields;
     return fields;
   }
 
@@ -35,7 +35,7 @@ public:
   static void set(
     std::string const& className,
     std::string const& fieldName,
-    _reflect_Field const& field
+    reflect_Field const& field
   ){
     auto& fields = getMap();
     fields[className][fieldName] = field;
@@ -52,7 +52,7 @@ public:
   static int get(
     std::string const& className,
     std::string const& fieldName,
-    _reflect_Field& field)
+    reflect_Field& field)
   {
     auto& fields = getMap();
     auto itc = fields.find(className);
