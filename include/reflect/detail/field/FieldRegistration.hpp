@@ -1,6 +1,8 @@
 #if !defined(_reflect_FieldRegistration_hpp)
 #define _reflect_FieldRegistration_hpp
 
+#include <cstddef>
+
 #include "reflect/detail/field/FieldRegistry.hpp"
 
 class _reflect_Field;
@@ -18,17 +20,13 @@ public:
   }
 };
 
-#define REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Class, ...)\
-static Class _reflect_forRegistration_##Class (__VA_ARGS__);
-
 /// 【!】不允许注册引用型的成员
 #define REFLECT_REGISTER_FIELD_REGISTER(Class,field,FieldType) \
 static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class##_##field( \
   #Class, #field, \
   _reflect_Field( \
-    ((uint64_t)(&((_reflect_forRegistration_##Class).field))) - \
-      ((uint64_t)(&(_reflect_forRegistration_##Class))), \
-    sizeof((_reflect_forRegistration_##Class).field), \
+    offsetof(Class,field), \
+    sizeof(Class::field), \
     #field \
   ) \
 );

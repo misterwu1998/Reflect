@@ -134,23 +134,6 @@ REFLECT_REGISTER_CONSTRUCTOR(Foo, crStr,    std::string const&)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, both,     int, const char*)
 ```
 `昵称`仅用于区分可能被注册的多个构造函数，不能重复；随便起名即可。
-### REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(反射类, 构造函数实参列表)
-```cpp
-REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo)
-```
-或者
-```cpp
-REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo, 123)
-```
-或者
-```cpp
-REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo, "John")
-```
-或者
-```cpp
-REFLECT_REGISTER_FIELD_PREPARE_INSTANCE(Foo, 123,"John")
-```
-仅用于在注册类的域之前提供一个对象实例。
 ### REFLECT_REGISTER_FIELD_REGISTER(反射类,域,值类型)
 ```cpp
 REFLECT_REGISTER_FIELD_REGISTER(Foo,id,int)
