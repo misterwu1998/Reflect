@@ -6,6 +6,7 @@
 
 class reflect_Field;
 class reflect_Method;
+#include "reflect/detail/json/JSON_decl.hpp"
 
 class reflect_Obj
 {
@@ -70,6 +71,16 @@ public:
   std::unordered_map<
     std::string/*方法名*/,
     reflect_Method> const* getMethods();
+    
+  /// @brief 
+  /// @param json 
+  /// @return 1 OK; 0 fail
+  int toJSON(reflect_JSON& json);
+
+  /// @brief 
+  /// @param json 
+  /// @return 1 OK; 0 fail
+  int fromJSON(reflect_JSON const& json);
 
 };
 

@@ -8,6 +8,7 @@
 #include "reflect/detail/class/ClassRegistration.hpp"
 #include "reflect/detail/field/Field.hpp"
 #include "reflect/detail/method/Method.hpp"
+#include "reflect/detail/json/JSON_decl.hpp"
 
 template <typename FieldType>
 FieldType* reflect_Obj::access(std::string const& fieldName){
@@ -104,6 +105,22 @@ std::unordered_map<
   reflect_Method> const* reflect_Obj::getMethods()
 {
   return _reflect_normalRegistry::getMethods(__className);
+}
+
+int reflect_Obj::toJSON(reflect_JSON& json){
+  int (*f)(void*, reflect_JSON&);
+  int ret;
+  auto fields = getFields();
+  for(auto& kv: *fields){
+    auto& field = kv.second;
+    f = field.toJSON;
+    if(f(((void*)this) + field.offset, json    )){}
+    else return 0;
+  }
+}
+
+int reflect_Obj::fromJSON(reflect_JSON const& json){
+  
 }
 
 #define REFLECT_ACCESS(pointer_or_sharedPtr, fieldName, type)\

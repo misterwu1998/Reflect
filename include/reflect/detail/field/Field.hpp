@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "reflect/detail/json/JSON_decl.hpp"
+
 /// @brief 域的类型无关的属性，即，无论什么类的什么类型的域，都会有这里定义的属性。
 class reflect_Field
 { 
@@ -12,12 +14,14 @@ public:
   unsigned int size;
   std::string name;
   std::string typeName;
+  int (*toJSON)(void*, reflect_JSON&);
  
   reflect_Field(  unsigned int offset, 
                   unsigned int size, 
                   std::string const& name,
-                  std::string const& typeName) 
-    : offset(offset), size(size), name(name), typeName(typeName) {}
+                  std::string const& typeName,
+                  int (*toJSON)(void*, reflect_JSON&)) 
+    : offset(offset), size(size), name(name), typeName(typeName), toJSON(toJSON) {}
   reflect_Field(){}
 
   inline unsigned int getOffset() const{return offset;}

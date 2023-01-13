@@ -20,13 +20,20 @@ _reflect_FieldRegistration<FieldType>::_reflect_FieldRegistration(
 
 /// 【!】不允许注册引用型的成员
 #define REFLECT_REGISTER_FIELD(Class,field,FieldType) \
+inline int _reflect_toJSON_##Class##_##field (void* p, reflect_JSON& jsonValue) \
+{ \
+  if(p==NULL) return 0; \
+  auto& f = *((FieldType*)p); \
+  return toJSON_basic_or_reflectObj(f,jsonValue); \
+} \
 static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class##_##field( \
   #Class, #field, \
   reflect_Field( \
     offsetof(Class,field), \
     sizeof(Class::field), \
     #field, \
-    #FieldType \
+    #FieldType, \
+    _reflect_toJSON_##Class##_##field \
   ) \
 );
 

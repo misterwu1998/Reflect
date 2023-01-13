@@ -5,6 +5,7 @@ include(CTest)
 enable_testing()
 
 include_directories(./include/)
+include_directories(../MyUtils/include/)
 include_directories(../../nlohmann/json/include/)
 
 file(GLOB_RECURSE TEST_CPP ./test/*.cpp)
