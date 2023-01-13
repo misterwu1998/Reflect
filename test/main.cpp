@@ -4,7 +4,15 @@
 
 #include "./Foo.hpp"
 
-#include "reflect/detail/class/normal.hpp"
+// for coding
+// #include "reflect/detail/class/normal.hpp" 
+// #include "reflect/detail/class/ClassRegistration.inl"
+// #include "reflect/detail/class/normal.inl"
+// #include "reflect/detail/field/FieldRegistration.inl"
+// #include "reflect/detail/field/FieldRegistry.inl"
+// #include "reflect/detail/method/MethodRegistration.inl"
+// #include "reflect/detail/method/MethodRegistry.inl"
+// #include "reflect/detail/object/Obj.inl"
 
 #define __test_memberFunctor 0
 #define __test_templateVoidArg 0

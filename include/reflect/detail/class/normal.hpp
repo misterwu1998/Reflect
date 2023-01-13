@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <string>
 
-#include "reflect/detail/field/Field.hpp"
-#include "reflect/detail/method/Method.hpp"
+class reflect_Field;
+class reflect_Method;
 
 /// @brief 每个类单独保存一份reflect_Field和reflect_Method，这个模块与模板无关
 class _reflect_normalRegistry
@@ -33,26 +33,13 @@ public:
     std::string const& className,
     std::string const& fieldName,
     reflect_Field const& field
-  ){
-    getFields()[className][fieldName] = field;
-  }
+  );
 
   static int get(
     std::string const& className,
     std::string const& fieldName,
     reflect_Field& field
-  ){
-    auto& f = getFields();
-    auto itc = f.find(className);
-    if(f.end()==itc)
-      return 0;
-    auto& c = itc->second;
-    auto itf = c.find(fieldName);
-    if(c.end()==itf)
-      return 0;
-    field = itf->second;
-    return 1;
-  }
+  );
 
   /// @brief 
   /// @param className 
@@ -70,26 +57,13 @@ public:
     std::string const& className,
     std::string const& methodName,
     reflect_Method const& method
-  ){
-    getMethods()[className][methodName] = method;
-  }
+  );
 
   static int get(
     std::string const& className,
     std::string const& methodName,
     reflect_Method& method
-  ){
-    auto& f = getMethods();
-    auto itc = f.find(className);
-    if(f.end()==itc)
-      return 0;
-    auto& c = itc->second;
-    auto itf = c.find(methodName);
-    if(c.end()==itf)
-      return 0;
-    method = itf->second;
-    return 1;
-  }
+  );
 
   /// @brief 
   /// @param className 
