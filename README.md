@@ -160,6 +160,8 @@ obj = reflect_new/*<int, char const*>*/("Foo", 123,"John");//指针也是值
 obj = reflect_new<std::string const&>("Foo","John");
 ```
 `reflect_new()`遇到[设计部分](#设计)所提到的“无效的”情况，将返回`nullptr`。
+### reflect_Obj::access(), REFLECT_ACCESS(对象指针,域名,类型)
+获取对象的成员变量的指针；遇到任何“无效的”情况，返回NULL。
 ### reflect_Obj::get()
 很多情况下，如果无需指定模板参数。
 ```cpp
@@ -195,4 +197,32 @@ ret = obj->func
 ```
 成功，返回1；遇到任何“无效的”情况，返回0。
 ### reflect_Obj::getFields(), reflect_Obj::getMethods()
-获取被注册的域和方法。这里不考虑序列化、JSON化、XML化之类的问题，仅提供无关于类型的reflect_Field、reflect_Method的遍历途径。
+获取被注册的域和方法。这里不考虑序列化、JSON化、XML化之类的问题，仅提供无关于类型的reflect_Field、reflect_Method的遍历途径。序列化的实现可参照[Serial](../Serial/)<br>
+### 序列化与反射
+我认为，序列化和反射解决不同的痛点，只不过这些痛点往往同时出现，所以很多“轮子”一口气把它们都解决了。<br>
+通信双方都使用同一个类，发送方怎么把这个类在内存中的实例对象变成字节流发送出去、接收方怎么把字节流变成内存中的实例对象，是序列化解决的问题。这个类叫什么、类里边各个成员变量叫什么、这个名字对应哪个类、那个名字又对应哪个成员？这些是反射解决的问题。<br>
+- Serial + Reflect 实现未知类对象的二进制序列化<br>
+```cpp
+#define REFLECT_SERIALIZE(pointer_or_sharedPtr,serialRetCode,archiver)\
+(pointer_or_sharedPtr ? \
+  pointer_or_sharedPtr->func<serial_Archiver&>("serialize", serialRetCode,archiver) : \
+  -1)
+
+int serialRetCode;
+int reflectRetCode;
+Buffer output;
+serial_Archiver ao(output, 二进制序列化_大端或小端);
+reflectRetCode = REFLECT_SERIALIZE(obj,serialRetCode,ao);
+... //发送output中的数据
+
+... //发送用于反射获取类对象实例的信息
+
+std::string className; ... //读取用于反射获取类对象实例的信息
+auto obj = reflect_share(className);
+
+Buffer input; ... //读取数据到input
+serial_Archiver ai(input, 二进制序列化_大端或小端);
+reflectRetCode = REFLECT_SERIALIZE(obj,serialRetCode,ai);
+```
+- Reflect与JSON化<br>
+[REFLECT_ACCESS()宏](#reflect_objaccess-reflect_access对象指针域名类型)基本实现了编译期类型明确的JSON化，借助现成的JSON库即可与JSON对象迅速转换。

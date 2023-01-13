@@ -12,9 +12,28 @@ public:
 
   /// @brief 只要是借助反射机制动态获取的对象，这一字符串用于记录实际类名
   std::string __className;
+  std::string getClassName() const{return __className;}
   
   reflect_Obj(){}
   virtual ~reflect_Obj(){}
+
+  /// @brief 
+  /// @tparam FieldType 
+  /// @param fieldName 
+  /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__className没有注册类型为FieldType、名称为fieldName的域
+  template <typename FieldType>
+  FieldType* access(std::string const& fieldName){
+    reflect_Field f;
+    if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
+      return (
+        (FieldType*)
+        (
+          ((void*)this) +
+          f.offset
+        )
+      );
+    else return NULL;
+  }
 
   /// @brief 
   /// @tparam FieldType 
@@ -122,6 +141,9 @@ public:
   }
 
 };
+
+#define REFLECT_ACCESS(pointer_or_sharedPtr, fieldName, type)\
+(pointer_or_sharedPtr ? pointer_or_sharedPtr->access<type>(fieldName) : ((type*)NULL))
 
 template <typename ... ConstructorArgTypes>
 inline reflect_Obj* reflect_new(

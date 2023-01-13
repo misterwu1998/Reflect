@@ -1,7 +1,7 @@
 #if !defined(_reflect_FieldRegistry_hpp)
 #define _reflect_FieldRegistry_hpp
 
-#define _REFLECT_DEBUG 1
+#define _REFLECT_DEBUG 0
 
 #include <unordered_map>
 #include <memory>

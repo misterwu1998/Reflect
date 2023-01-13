@@ -1,7 +1,7 @@
 #if !defined(_reflect_MethodRegistry_hpp)
 #define _reflect_MethodRegistry_hpp
 
-#define _REFLECT_DEBUG 1
+#define _REFLECT_DEBUG 0
 
 #include <memory>
 #include <unordered_map>

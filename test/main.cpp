@@ -39,7 +39,13 @@ int main(int argc, char const *argv[])
   raw = reflect_new<std::string const&>("Foo","田所");
   if(raw) delete raw;
   raw = reflect_new/* <int, char const*> */("Foo", 114514,"foo");
+  {auto p = REFLECT_ACCESS(raw,"id",int);}
+  {auto p = REFLECT_ACCESS(raw,"name", std::string); std::cout << "name is " << *p << std::endl;}
+  {auto p = REFLECT_ACCESS(raw,"unknown", int);}
+  {auto p = REFLECT_ACCESS(raw,"unknown", std::string);}
   if(raw) delete raw;
+  raw = NULL;
+  {auto p = REFLECT_ACCESS(raw,"id",int);}
 
   shared = reflect_share/*<>*/("unknown");
   shared = reflect_share<int&&>("unknown",114514);//int&&型应当注册了Foo::Foo()，而没有unknown
@@ -61,6 +67,10 @@ int main(int argc, char const *argv[])
   ret = shared->get("unknown",name);
   ret = shared->set("unknown",123);
   ret = shared->set("unknown", std::string("nobody"));
+  {auto p = REFLECT_ACCESS(shared,"id",int);}
+  {auto p = REFLECT_ACCESS(shared,"name",std::string); std::cout << "name is " << *p << std::endl;}
+  {auto p = REFLECT_ACCESS(shared,"unknown", int);}
+  {auto p = REFLECT_ACCESS(shared,"unknown", std::string);}
 
   ret = shared->pro("nothing");
   ret = shared->pro/* <double> */("shout",114.514);
@@ -95,6 +105,9 @@ int main(int argc, char const *argv[])
               << kv.second.getArgTypeNames() << "; "
               << kv.second.getFunctor() << std::endl;
   }
+
+  shared = nullptr;
+  {auto p = REFLECT_ACCESS(shared,"id",int);}
 
   return 0;
 
