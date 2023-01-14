@@ -114,9 +114,10 @@ int reflect_Obj::toJSON(reflect_JSON& json){
   for(auto& kv: *fields){
     auto& field = kv.second;
     f = field.toJSON;
-    if(f(((void*)this) + field.offset, json    )){}
+    if(f(((void*)this) + field.offset, json[field.name])){}
     else return 0;
   }
+  return 1;
 }
 
 int reflect_Obj::fromJSON(reflect_JSON const& json){

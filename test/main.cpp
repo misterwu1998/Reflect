@@ -115,6 +115,10 @@ int main(int argc, char const *argv[])
               << kv.second.getFunctor() << std::endl;
   }
 
+  reflect_JSON json;
+  ret = shared->toJSON(json);
+  std::cout << json.dump() << std::endl;
+
   shared = nullptr;
   {auto p = REFLECT_ACCESS(shared,"id",int);}
 

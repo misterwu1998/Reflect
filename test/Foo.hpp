@@ -4,10 +4,23 @@
 #include <iostream>
 #include "reflect/single_include.hpp"
 
+class Bar: public reflect_Obj{
+public:
+  std::vector<int> v;
+  Bar(){
+    v.emplace_back(114514);
+    v.emplace_back(1919810);
+  }
+};
+
+REFLECT_REGISTER_CONSTRUCTOR(Bar,prototype)
+REFLECT_REGISTER_FIELD(Bar,v,std::vector<int>)
+
 class Foo : public reflect_Obj{
 public:
   int id;
   std::string name;
+  Bar bar;
   Foo():id(1919810){}
   Foo(int&& id):id(id){}
   Foo(std::string const& name):name(name){
@@ -28,6 +41,7 @@ REFLECT_REGISTER_CONSTRUCTOR(Foo, crStr, std::string const&)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, both, int, const char*)
 REFLECT_REGISTER_FIELD(Foo,id,int)
 REFLECT_REGISTER_FIELD(Foo,name, std::string)
+REFLECT_REGISTER_FIELD(Foo,bar,Bar)
 REFLECT_REGISTER_METHOD(Foo,getId,int)
 REFLECT_REGISTER_METHOD(Foo,shout,void,double)
 REFLECT_REGISTER_METHOD(Foo,nothing,void)

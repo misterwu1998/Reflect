@@ -24,7 +24,7 @@ inline int _reflect_toJSON_##Class##_##field (void* p, reflect_JSON& jsonValue) 
 { \
   if(p==NULL) return 0; \
   auto& f = *((FieldType*)p); \
-  return toJSON_basic_or_reflectObj(f,jsonValue); \
+  return toJSON_basic_or_reflectObj<FieldType>(f,jsonValue); \
 } \
 static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class##_##field( \
   #Class, #field, \
