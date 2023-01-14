@@ -18,10 +18,7 @@ CheckMemberFunctionExistence(toJSON)
 template <typename T, 
           EnableIf_ptr<HasMemberFunction_toJSON<T>::result &&
                        std::is_base_of<reflect_Obj,T>::value> p = nullptr >
-int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue)
-{
-  return obj.toJSON(jsonValue);
-}
+int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue);
 
 /// @brief 
 /// @tparam T 
@@ -31,10 +28,6 @@ int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue)
 /// @return 1 OK; 0 fail
 template <typename T,
           EnableIf_ptr<! HasMemberFunction_toJSON<T>::result> p = nullptr>
-int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue)
-{
-  jsonValue = obj;
-  return 1;
-}
+int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue);
 
 #endif // _reflect_dispatch_hpp

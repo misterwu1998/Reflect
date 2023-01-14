@@ -15,5 +15,6 @@
 #include "reflect/detail/method/MethodRegistration.inl"
 #include "reflect/detail/method/MethodRegistry.inl"
 #include "reflect/detail/object/Obj.inl"
+#include "reflect/detail/json/dispatch.inl"
 
 #endif // _reflect_single_include_hpp

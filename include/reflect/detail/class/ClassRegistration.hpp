@@ -20,4 +20,10 @@ public:
   );
 };
 
+template <typename Class>
+class _reflect_ClassNameRegistration{
+public:
+  _reflect_ClassNameRegistration(std::string const& name);
+};
+
 #endif // _reflect_ClassRegistration_hpp 

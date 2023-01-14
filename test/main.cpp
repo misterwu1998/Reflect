@@ -13,7 +13,7 @@
 // #include "reflect/detail/method/MethodRegistration.inl"
 // #include "reflect/detail/method/MethodRegistry.inl"
 // #include "reflect/detail/object/Obj.inl"
-#include "reflect/detail/json/dispatch.hpp"
+// #include "reflect/detail/json/dispatch.hpp"
 
 #define __test_memberFunctor 0
 #define __test_templateVoidArg 0
