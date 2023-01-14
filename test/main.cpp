@@ -15,6 +15,12 @@
 // #include "reflect/detail/object/Obj.inl"
 // #include "reflect/detail/json/dispatch.hpp"
 
+#include "serial/single_include.hpp"
+#define REFLECT_SERIALIZE(pointer_or_sharedPtr,serialRetCode,archiver)\
+(pointer_or_sharedPtr ? \
+  pointer_or_sharedPtr->func<int,serial_Archiver&>("serialize", serialRetCode,archiver) : \
+  -1)
+
 #define __test_memberFunctor 0
 #define __test_templateVoidArg 0
 
@@ -114,6 +120,15 @@ int main(int argc, char const *argv[])
               << kv.second.getArgTypeNames() << "; "
               << kv.second.getFunctor() << std::endl;
   }
+
+  // 演示二进制序列化
+  int rrc;
+  int src;
+  Buffer b;
+  serial_Archiver ao(b, serial_ArchiverType::out_binary_littleEndian);
+  rrc = REFLECT_SERIALIZE(shared,src,ao);
+  serial_Archiver ai(b, serial_ArchiverType::in_binary_littleEndian);
+  rrc = REFLECT_SERIALIZE(shared,src,ai);
 
   reflect_JSON j;
   ret = shared->toJSON(j);

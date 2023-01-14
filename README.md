@@ -187,7 +187,7 @@ ret = obj->pro/*<double>*/("shout",114.514);
 ```
 成功，返回1；遇到任何“无效的”情况，返回0。
 ### reflect_Obj::func()
-调用有返回值的成员方法。类似地，形参全部都是值类型时，模板参数就不必指定，其余时候都必须指定。
+调用有返回值的成员方法。类似地，返回值、形参全部都是值类型时，模板参数就不必指定，其余时候都必须指定。
 ```cpp
 int* (*ptr)(std::unique_ptr<float>);
 ret = obj->func("getId",id);
@@ -207,7 +207,7 @@ ret = obj->func
 ```cpp
 #define REFLECT_SERIALIZE(pointer_or_sharedPtr,serialRetCode,archiver)\
 (pointer_or_sharedPtr ? \
-  pointer_or_sharedPtr->func<serial_Archiver&>("serialize", serialRetCode,archiver) : \
+  pointer_or_sharedPtr->func<int,serial_Archiver&>("serialize", serialRetCode,archiver) : \
   -1)
 
 int serialRetCode;

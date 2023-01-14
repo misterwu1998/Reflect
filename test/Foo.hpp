@@ -16,6 +16,8 @@ public:
 REFLECT_REGISTER_CONSTRUCTOR(Bar,prototype)
 REFLECT_REGISTER_FIELD(Bar,v,std::vector<int>)
 
+#include "serial/single_include.hpp"
+
 class Foo : public reflect_Obj{
 public:
   int id;
@@ -33,6 +35,10 @@ public:
   int* (*func(std::string s, Foo&& f))(std::unique_ptr<float>)
     {return (int* (*)(std::unique_ptr<float>))114514;}
   ~Foo(){}
+
+  // 用于演示二进制序列化
+  int serialize(serial_Archiver& a)
+  {return a(id,name);}
 };
 
 REFLECT_REGISTER_CONSTRUCTOR(Foo, prototype)
@@ -46,6 +52,8 @@ REFLECT_REGISTER_METHOD(Foo,getId,int)
 REFLECT_REGISTER_METHOD(Foo,shout,void,double)
 REFLECT_REGISTER_METHOD(Foo,nothing,void)
 REFLECT_REGISTER_METHOD(Foo,func, int* (*)(std::unique_ptr<float>), std::string, Foo&&)
+
+REFLECT_REGISTER_METHOD(Foo,serialize,int,serial_Archiver&)
 
 #if 0 //旧版，非类型安全
 
