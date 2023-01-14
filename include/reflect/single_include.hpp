@@ -6,7 +6,6 @@
 #include "reflect/detail/field/Field.hpp"
 #include "reflect/detail/method/Method.hpp"
 #include "reflect/detail/json/JSON_decl.hpp"
-#include "reflect/detail/json/dispatch.hpp"
 
 #include "reflect/detail/class/ClassRegistration.inl"
 #include "reflect/detail/class/normal.inl"

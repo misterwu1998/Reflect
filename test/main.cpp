@@ -70,7 +70,7 @@ int main(int argc, char const *argv[])
   ret = shared->get("id",id);
   ret = shared->get("name",name);
   // ret = shared->set/*<char const*>*/("name","王爷");//编译在赋值语句处报错：invalid array assignment
-  ret = shared->set<std::string>("name","王爷");//ok
+  ret = shared->set<std::string>("name","nobody");//ok
   ret = shared->get("name",name);
   ret = shared->get("unknown",id);
   ret = shared->get("unknown",name);
@@ -115,9 +115,23 @@ int main(int argc, char const *argv[])
               << kv.second.getFunctor() << std::endl;
   }
 
-  reflect_JSON json;
-  ret = shared->toJSON(json);
-  std::cout << json.dump() << std::endl;
+  reflect_JSON j;
+  ret = shared->toJSON(j);
+  auto dumpling = j.dump();
+  std::cout << dumpling << std::endl;
+
+  j["bar"]["v"] = {1919810,114514};
+  j["id"] = 1024;
+  j["name"] = "王爷";
+  std::cout << j.dump() << std::endl;
+  raw = reflect_new("Foo");
+  raw->fromJSON(j);
+  {auto p = REFLECT_ACCESS(raw,"id",int); std::cout << *p << '\t';}
+  {auto p = REFLECT_ACCESS(raw,"name",std::string); std::cout << *p << std::endl;}
+  delete raw;
+
+  raw = NULL;
+  {auto p = REFLECT_ACCESS(shared,"id",int);}
 
   shared = nullptr;
   {auto p = REFLECT_ACCESS(shared,"id",int);}

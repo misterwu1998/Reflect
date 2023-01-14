@@ -26,6 +26,12 @@ inline int _reflect_toJSON_##Class##_##field (void* p, reflect_JSON& jsonValue) 
   auto& f = *((FieldType*)p); \
   return toJSON_basic_or_reflectObj<FieldType>(f,jsonValue); \
 } \
+inline int _reflect_fromJSON_##Class##_##field (reflect_JSON const& jsonValue, void* p) \
+{ \
+  if(p==NULL) return 0; \
+  auto& f = *((FieldType*)p); \
+  return fromJSON_basic_or_reflectObj<FieldType>(jsonValue,f); \
+} \
 static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class##_##field( \
   #Class, #field, \
   reflect_Field( \
@@ -33,7 +39,8 @@ static _reflect_FieldRegistration<FieldType> _reflect_fieldRegistration_##Class#
     sizeof(Class::field), \
     #field, \
     #FieldType, \
-    _reflect_toJSON_##Class##_##field \
+    _reflect_toJSON_##Class##_##field, \
+    _reflect_fromJSON_##Class##_##field \
   ) \
 );
 

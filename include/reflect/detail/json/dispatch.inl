@@ -22,4 +22,21 @@ inline int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue)
   return 1;
 }
 
+template <typename T,
+          EnableIf_ptr<HasMemberFunction_fromJSON<T>::result &&
+                       std::is_base_of<reflect_Obj,T>::value> p>
+inline int fromJSON_basic_or_reflectObj(reflect_JSON const& jsonValue, T& obj)
+{
+  obj.__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
+  return obj.fromJSON(jsonValue);
+}
+
+template <typename T,
+          EnableIf_ptr<! HasMemberFunction_fromJSON<T>::result> p>
+inline int fromJSON_basic_or_reflectObj(reflect_JSON const& jsonValue, T& obj)
+{
+  jsonValue.get_to(obj);
+  return 1;
+}
+
 #endif // _reflect_dispatch_inl

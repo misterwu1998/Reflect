@@ -199,7 +199,7 @@ ret = obj->func
 ### reflect_Obj::getFields(), reflect_Obj::getMethods()
 获取被注册的域和方法。这里不考虑序列化、JSON化、XML化之类的问题，仅提供无关于类型的reflect_Field、reflect_Method的遍历途径。序列化的实现可参照[Serial](../Serial/)<br>
 ### JSON化
-[REFLECT_ACCESS()宏](#reflect_objaccess-reflect_access对象指针域名类型)基本实现了编译期类型明确的JSON化，借助现成的JSON库即可与JSON对象迅速转换。这里，我选择[nlohmann的json](../../nlohmann/json/)，实现了`reflect_Obj::toJSON()`、`reflect::Obj::fromJSON()`。
+当前库基本实现了编译期类型明确的JSON化，借助现成的JSON库即可与JSON对象迅速转换。这里，我选择[nlohmann的json](../../nlohmann/json/)，实现了`reflect_Obj::toJSON()`、`reflect::Obj::fromJSON()`。
 ### 二进制序列化
 我认为，序列化和反射解决不同的痛点，只不过这些痛点往往同时出现，所以很多“轮子”一口气把它们都解决了。<br>
 通信双方都使用同一个类，发送方怎么把这个类在内存中的实例对象变成字节流发送出去、接收方怎么把字节流变成内存中的实例对象，是序列化解决的问题。这个类叫什么、类里边各个成员变量叫什么、这个名字对应哪个类、那个名字又对应哪个成员？这些是反射解决的问题。<br>

@@ -121,7 +121,18 @@ int reflect_Obj::toJSON(reflect_JSON& json){
 }
 
 int reflect_Obj::fromJSON(reflect_JSON const& json){
-  
+  int (*f)(reflect_JSON const&, void*);
+  int ret;
+  auto fields = getFields();
+  for(auto& kv: *fields){
+    auto& field = kv.second;
+    if(json.contains(field.name)){}
+    else return 0;
+    f = field.fromJSON;
+    if(f(json[field.name], ((void*)this) + field.offset)){}
+    else return 0;
+  }
+  return 1;
 }
 
 #define REFLECT_ACCESS(pointer_or_sharedPtr, fieldName, type)\

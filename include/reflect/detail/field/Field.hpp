@@ -15,13 +15,15 @@ public:
   std::string name;
   std::string typeName;
   int (*toJSON)(void*, reflect_JSON&);
+  int (*fromJSON)(reflect_JSON const&, void*);
  
   reflect_Field(  unsigned int offset, 
                   unsigned int size, 
                   std::string const& name,
                   std::string const& typeName,
-                  int (*toJSON)(void*, reflect_JSON&)) 
-    : offset(offset), size(size), name(name), typeName(typeName), toJSON(toJSON) {}
+                  int (*toJSON)(void*, reflect_JSON&),
+                  int (*fromJSON)(reflect_JSON const&, void*)) 
+    : offset(offset), size(size), name(name), typeName(typeName), toJSON(toJSON), fromJSON(fromJSON) {}
   reflect_Field(){}
 
   inline unsigned int getOffset() const{return offset;}
