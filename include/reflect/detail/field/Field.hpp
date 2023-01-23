@@ -14,14 +14,14 @@ public:
   unsigned int size;
   std::string name;
   std::string typeName;
-  int (*toJSON)(void*, reflect_JSON&);
-  int (*fromJSON)(reflect_JSON const&, void*);
+  int (*toJSON)(void const*, reflect_JSON&);/// @return 1 OK; 0 fail
+  int (*fromJSON)(reflect_JSON const&, void*);/// @return 1 OK; 0 fail
  
   reflect_Field(  unsigned int offset, 
                   unsigned int size, 
                   std::string const& name,
                   std::string const& typeName,
-                  int (*toJSON)(void*, reflect_JSON&),
+                  int (*toJSON)(void const*, reflect_JSON&),
                   int (*fromJSON)(reflect_JSON const&, void*)) 
     : offset(offset), size(size), name(name), typeName(typeName), toJSON(toJSON), fromJSON(fromJSON) {}
   reflect_Field(){}

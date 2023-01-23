@@ -58,6 +58,8 @@ int main(int argc, char const *argv[])
   {auto p = REFLECT_ACCESS(raw,"name", std::string); std::cout << "name is " << *p << std::endl;}
   {auto p = REFLECT_ACCESS(raw,"unknown", int);}
   {auto p = REFLECT_ACCESS(raw,"unknown", std::string);}
+  {auto p = ((reflect_Obj const*)raw)->access<int>("id");}
+  {auto p = REFLECT_ACCESS(((reflect_Obj const*)raw),"id",int);}
   if(raw) delete raw;
   raw = NULL;
   {auto p = REFLECT_ACCESS(raw,"id",int);}

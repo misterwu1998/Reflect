@@ -28,9 +28,15 @@ public:
   /// @brief 
   /// @tparam FieldType 
   /// @param fieldName 
+  /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__className没有注册类型为FieldType、名称为fieldName的域
+  template <typename FieldType> FieldType const* access(std::string const& fieldName) const;
+
+  /// @brief 
+  /// @tparam FieldType 
+  /// @param fieldName 
   /// @param value 
   /// @return 1 OK; 0 反射类__className没有注册类型为FieldType、名称为fieldName的域
-  template <typename FieldType>  int get(std::string const& fieldName, FieldType& value);
+  template <typename FieldType>  int get(std::string const& fieldName, FieldType& value) const;
 
   /// @brief 
   /// @tparam FieldType 
@@ -66,16 +72,16 @@ public:
 
   std::unordered_map<
     std::string/*域名*/,
-    reflect_Field> const* getFields();
+    reflect_Field> const* getFields() const;
   
   std::unordered_map<
     std::string/*方法名*/,
-    reflect_Method> const* getMethods();
+    reflect_Method> const* getMethods() const;
     
   /// @brief 
   /// @param json 
   /// @return 1 OK; 0 fail
-  int toJSON(reflect_JSON& json);
+  int toJSON(reflect_JSON& json) const;
 
   /// @brief 
   /// @param json 

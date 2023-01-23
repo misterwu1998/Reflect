@@ -8,15 +8,15 @@
 template <typename T, 
           EnableIf_ptr<HasMemberFunction_toJSON<T>::result &&
                        std::is_base_of<reflect_Obj,T>::value> p>
-inline int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue)
+inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
 {
-  obj.__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
+  const_cast<T&>(obj).__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
   return obj.toJSON(jsonValue);
 }
 
 template <typename T,
           EnableIf_ptr<! HasMemberFunction_toJSON<T>::result> p>
-inline int toJSON_basic_or_reflectObj(T& obj, reflect_JSON& jsonValue)
+inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
 {
   jsonValue = obj;
   return 1;

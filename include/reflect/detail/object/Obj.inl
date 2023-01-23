@@ -25,7 +25,21 @@ FieldType* reflect_Obj::access(std::string const& fieldName){
 }
 
 template <typename FieldType>
-int reflect_Obj::get(std::string const& fieldName, FieldType& value)
+FieldType const* reflect_Obj::access(std::string const& fieldName) const{
+  reflect_Field f;
+  if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
+    return (
+      (FieldType const*)
+      (
+        ((void const*)this) +
+        f.offset
+      )
+    );
+  else return NULL;
+}
+
+template <typename FieldType>
+int reflect_Obj::get(std::string const& fieldName, FieldType& value) const
 {
   reflect_Field f;
   if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
@@ -95,27 +109,27 @@ int reflect_Obj::pro(
 
 std::unordered_map<
   std::string/*域名*/,
-  reflect_Field> const* reflect_Obj::getFields()
+  reflect_Field> const* reflect_Obj::getFields() const
 {
   return _reflect_normalRegistry::getFields(__className);
 }
 
 std::unordered_map<
   std::string/*方法名*/,
-  reflect_Method> const* reflect_Obj::getMethods()
+  reflect_Method> const* reflect_Obj::getMethods() const
 {
   return _reflect_normalRegistry::getMethods(__className);
 }
 
-int reflect_Obj::toJSON(reflect_JSON& json){
-  int (*f)(void*, reflect_JSON&);
+int reflect_Obj::toJSON(reflect_JSON& json) const{
+  int (*f)(void const*, reflect_JSON&);
   int ret;
   auto fields = getFields();
   for(auto& kv: *fields){
     auto& field = kv.second;
     f = field.toJSON;
-    if(f(((void*)this) + field.offset, json[field.name])){}
-    else return 0;
+    if(f(((void const*)this) + field.offset, json[field.name])){}
+    else return 0;// fail
   }
   return 1;
 }
