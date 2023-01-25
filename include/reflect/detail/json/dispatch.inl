@@ -3,14 +3,14 @@
 
 #include "reflect/detail/json/dispatch.hpp"
 
-#include "reflect/detail/class/ClassName.hpp"
+#include "reflect/detail/type/TypeName.hpp"
 
 template <typename T, 
           EnableIf_ptr<HasMemberFunction_toJSON<T>::result &&
                        std::is_base_of<reflect_Obj,T>::value> p>
 inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
 {
-  const_cast<T&>(obj).__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
+  const_cast<T&>(obj).__typeName = reflect_TypeName<T>::registerOrGet();//确保携带着类名
   return obj.toJSON(jsonValue);
 }
 
@@ -27,7 +27,7 @@ template <typename T,
                        std::is_base_of<reflect_Obj,T>::value> p>
 inline int fromJSON_basic_or_reflectObj(reflect_JSON const& jsonValue, T& obj)
 {
-  obj.__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
+  obj.__typeName = reflect_TypeName<T>::registerOrGet();//确保携带着类名
   return obj.fromJSON(jsonValue);
 }
 

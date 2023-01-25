@@ -7,23 +7,23 @@
 
 template <typename ReturnType, typename ... ArgTypes>
 void _reflect_MethodRegistry<ReturnType, ArgTypes...>::set(
-  std::string const& className,
+  std::string const& typeName,
   std::string const& methodName,
   reflect_Method const& method
 ){
   auto& methods = getMap();
-  methods[className][methodName] = method;
-  // std::cout << "_reflect_MethodRegistry::set(): register " << className << "::" << methodName << "()" << std::endl;
+  methods[typeName][methodName] = method;
+  // std::cout << "_reflect_MethodRegistry::set(): register " << typeName << "::" << methodName << "()" << std::endl;
 }
 
 template <typename ReturnType, typename ... ArgTypes>
 int _reflect_MethodRegistry<ReturnType, ArgTypes...>::get(
-  std::string const& className,
+  std::string const& typeName,
   std::string const& methodName,
   reflect_Method& method
 ){
   auto& methods = getMap();
-  auto itc = methods.find(className);
+  auto itc = methods.find(typeName);
   if(methods.end()==itc)
     return 0;
   auto& c = itc->second;

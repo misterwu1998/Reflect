@@ -27,18 +27,18 @@ class _reflect_MethodRegistry
 public:
 
   static void set(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& methodName,
     reflect_Method const& method
   );
 
   /// @brief 
-  /// @param className 
+  /// @param typeName 
   /// @param methodName 
   /// @param method [out]
   /// @return 1 有; 0 无
   static int get(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& methodName,
     reflect_Method& method
   );

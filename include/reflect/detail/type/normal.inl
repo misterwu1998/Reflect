@@ -1,26 +1,26 @@
 #if !defined(_reflect_normal_inl)
 #define _reflect_normal_inl
 
-#include "reflect/detail/class/normal.hpp"
+#include "reflect/detail/type/normal.hpp"
 
 #include "reflect/detail/field/Field.hpp"
 #include "reflect/detail/method/Method.hpp"
 
 void _reflect_normalRegistry::set(
-  std::string const& className,
+  std::string const& typeName,
   std::string const& fieldName,
   reflect_Field const& field
 ){
-  getFields()[className][fieldName] = field;
+  getFields()[typeName][fieldName] = field;
 }
 
 int _reflect_normalRegistry::get(
-  std::string const& className,
+  std::string const& typeName,
   std::string const& fieldName,
   reflect_Field& field
 ){
   auto& f = getFields();
-  auto itc = f.find(className);
+  auto itc = f.find(typeName);
   if(f.end()==itc)
     return 0;
   auto& c = itc->second;
@@ -32,20 +32,20 @@ int _reflect_normalRegistry::get(
 }
 
 void _reflect_normalRegistry::set(
-  std::string const& className,
+  std::string const& typeName,
   std::string const& methodName,
   reflect_Method const& method
 ){
-  getMethods()[className][methodName] = method;
+  getMethods()[typeName][methodName] = method;
 }
 
 int _reflect_normalRegistry::get(
-  std::string const& className,
+  std::string const& typeName,
   std::string const& methodName,
   reflect_Method& method
 ){
   auto& f = getMethods();
-  auto itc = f.find(className);
+  auto itc = f.find(typeName);
   if(f.end()==itc)
     return 0;
   auto& c = itc->second;

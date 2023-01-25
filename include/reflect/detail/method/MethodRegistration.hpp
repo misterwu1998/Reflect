@@ -8,7 +8,7 @@ class _reflect_MethodRegistration
 {
 public:
   _reflect_MethodRegistration(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& methodName,
     reflect_Method const& method
   );

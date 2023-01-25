@@ -27,18 +27,18 @@ class _reflect_FieldRegistry
 public:
 
   static void set(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& fieldName,
     reflect_Field const& field
   );
 
   /// @brief 
-  /// @param className 
+  /// @param typeName 
   /// @param fieldName 
   /// @param field [out]
   /// @return 1 有; 0 没有
   static int get(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& fieldName,
     reflect_Field& field);
 

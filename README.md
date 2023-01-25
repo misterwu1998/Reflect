@@ -3,23 +3,23 @@
 ```cpp
 using namespace std;
 template <typename T> using Ptr<T> = shared_ptr<T>;
-Ptr<ClassName> obj = new ClassName;
+Ptr<TypeName> obj = new TypeName;
 FT& field = obj->fieldName;//访问成员
 T r = obj->funcName(Ts... as);//调用函数
 ```
 抛开C++语法，这些语句表明正常情况下他们在编译前的代码编写期间就已经知道：
-1. ClassName 类名
+1. TypeName 类名
 2. fieldName 域名 + FT 域的类型
 3. funcName 函数名称 + {Ts...} 参数列表
 4. T 函数返回值类型 <i>最迟也能在编译期知道；void 是一种特例</i>
 
 现在他们的局面是，有很多信息延迟获知。因此，反射需要额外准备一些与字符串相关的映射：
-1. 有效的 "ClassName" -> 对象原型 obj
-2. 无效的 "ClassName" -> nullptr
-3. 有效的 {"ClassName","fieldName",FT} -> 读或写成员
-4. 无效的 {"ClassName","fieldName",FT} -> 什么也不做
-5. 有效的 {"ClassName","funcName", T, Ts...} -> 执行方法
-6. 无效的 {"ClassName","funcName", T, Ts...} -> 什么也不做
+1. 有效的 "TypeName" -> 对象原型 obj
+2. 无效的 "TypeName" -> nullptr
+3. 有效的 {"TypeName","fieldName",FT} -> 读或写成员
+4. 无效的 {"TypeName","fieldName",FT} -> 什么也不做
+5. 有效的 {"TypeName","funcName", T, Ts...} -> 执行方法
+6. 无效的 {"TypeName","funcName", T, Ts...} -> 什么也不做
 
 其中，带引号的元素是字符串，不带引号的元素是用户代码，并且用户将
 1. 在编译前的代码编写期间指定，或者在编译期间由编译器推导出不带引号的元素，交给反射库
@@ -40,7 +40,7 @@ unordered_map<
   Ptr<Obj> (*)(void)/*无参构造函数*/> constructors;
 ```
 然后借助`RegisterAction_*`静态对象的构造函数，在`main()`之前把键值对注册上去；利用宏定义缩短用户代码；这种办法其它映射也效仿。<br>
-需要注意的是，如果要允许用户在被反射类`Foo`的头文件`Foo.hpp`中就完成注册，而无需担心`Foo.hpp`被多个源文件include造成`RegisterAction_*`对象重复定义，~~那么`RegisterAction_*`应当定义为单例，重复调用其`getSingleton(string const& className, Ptr<Obj> (*constructor)())`也不会重复注册。~~（没关系，重复就重复，给`RegisterAction_*`对象加`static`完事）
+需要注意的是，如果要允许用户在被反射类`Foo`的头文件`Foo.hpp`中就完成注册，而无需担心`Foo.hpp`被多个源文件include造成`RegisterAction_*`对象重复定义，~~那么`RegisterAction_*`应当定义为单例，重复调用其`getSingleton(string const& typeName, Ptr<Obj> (*constructor)())`也不会重复注册。~~（没关系，重复就重复，给`RegisterAction_*`对象加`static`完事）
 ## 映射3、映射4
 一开始想到的是
 ```cpp
@@ -50,15 +50,15 @@ unordered_map<
     string /*域名*/,
     【?】/*FT -> 是否读写成员*/>> fields;
 ```
-前两层映射利用字符串，不难，问题是 FT -> 是否读写成员 的映射好像实现不了吧？思考了一下发现这样设计不对，因为 FT 最迟在库使用者的编译期被交给库，早于"className"、"fieldName"，因此映射3、映射4改写成这样会更贴近实现：
--  有效的 {FT,"ClassName","fieldName"} -> 读或写成员
--  无效的 {FT,"ClassName","fieldName"} -> 什么也不做
+前两层映射利用字符串，不难，问题是 FT -> 是否读写成员 的映射好像实现不了吧？思考了一下发现这样设计不对，因为 FT 最迟在库使用者的编译期被交给库，早于"typeName"、"fieldName"，因此映射3、映射4改写成这样会更贴近实现：
+-  有效的 {FT,"TypeName","fieldName"} -> 读或写成员
+-  无效的 {FT,"TypeName","fieldName"} -> 什么也不做
 
 这跟原来的映射3、映射4完全等效，有效还是无效，是三个元素共同决定的，只不过它们被传达到反射库的顺序又先后。<br>
 这样设计就比较可行了：
 ```cpp
 template <typename FieldType>
-class FieldRegistry{
+type FieldRegistry{
 public:
   static unordered_map<
     string/*类名*/,
@@ -93,15 +93,15 @@ public:
 
 ## 回到映射1、映射2
 有了映射5、映射6的经验，有参构造方法也能搞定了，映射1、映射2扩展为：
-- 有效的 {Ts..., "ClassName"} -> 已初始化的对象 obj
-- 无效的 {Ts..., "ClassName"} -> nullptr
+- 有效的 {Ts..., "TypeName"} -> 已初始化的对象 obj
+- 无效的 {Ts..., "TypeName"} -> nullptr
 ```cpp
 template <typename ... Ts>
-class ClassRegistry{
+class TypeRegistry{
 public:
   static unordered_map<
     string/*类名*/,
-    Ptr<Obj> (*)(Ts...)/*任意参数构造函数*/> classes;
+    Ptr<Obj> (*)(Ts...)/*任意参数构造函数*/> types;
 };
 ```
 相应地，单例`RegisterAction_*`也套上`template <typename ... Ts>`。
@@ -219,8 +219,8 @@ reflectRetCode = REFLECT_SERIALIZE(obj,serialRetCode,ao);
 
 ... //发送用于反射获取类对象实例的信息
 
-std::string className; ... //读取用于反射获取类对象实例的信息
-auto obj = reflect_share(className);
+std::string typeName; ... //读取用于反射获取类对象实例的信息
+auto obj = reflect_share(typeName);
 
 Buffer input; ... //读取数据到input
 serial_Archiver ai(input, 二进制序列化_大端或小端);

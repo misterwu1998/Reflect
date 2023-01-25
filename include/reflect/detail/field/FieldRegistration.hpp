@@ -8,7 +8,7 @@ class _reflect_FieldRegistration
 {
 public:
   _reflect_FieldRegistration(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& fieldName,
     reflect_Field const& field
   );

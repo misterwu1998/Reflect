@@ -30,51 +30,51 @@ class _reflect_normalRegistry
 public:
 
   static void set(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& fieldName,
     reflect_Field const& field
   );
 
   static int get(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& fieldName,
     reflect_Field& field
   );
 
   /// @brief 
-  /// @param className 
-  /// @return std::unordered_map<std::string/*域名*/,reflect_Field> const*; NULL表示className所指的类未注册任何域
+  /// @param typeName 
+  /// @return std::unordered_map<std::string/*域名*/,reflect_Field> const*; NULL表示typeName所指的类未注册任何域
   static std::unordered_map<
     std::string/*域名*/,
-    reflect_Field> const* getFields(std::string const& className){
+    reflect_Field> const* getFields(std::string const& typeName){
     auto& m = getFields();
-    if(m.count(className)<1)
+    if(m.count(typeName)<1)
       return NULL;
-    return &(m[className]);
+    return &(m[typeName]);
   }
 
   static void set(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& methodName,
     reflect_Method const& method
   );
 
   static int get(
-    std::string const& className,
+    std::string const& typeName,
     std::string const& methodName,
     reflect_Method& method
   );
 
   /// @brief 
-  /// @param className 
-  /// @return std::unordered_map<std::string/*域名*/,reflect_Method> const*; NULL表示className所指的类未注册任何方法
+  /// @param typeName 
+  /// @return std::unordered_map<std::string/*域名*/,reflect_Method> const*; NULL表示typeName所指的类未注册任何方法
   static std::unordered_map<
     std::string/*方法名*/,
-    reflect_Method> const* getMethods(std::string const& className){
+    reflect_Method> const* getMethods(std::string const& typeName){
     auto& m = getMethods();
-    if(m.count(className)<1)
+    if(m.count(typeName)<1)
       return NULL;
-    return &(m[className]);
+    return &(m[typeName]);
   }
 
 };

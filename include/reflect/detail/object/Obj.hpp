@@ -13,8 +13,8 @@ class reflect_Obj
 public:
 
   /// @brief 只要是借助反射机制动态获取的对象，这一字符串用于记录实际类名
-  std::string __className;
-  std::string getClassName() const{return __className;}
+  std::string __typeName;
+  std::string getTypeName() const{return __typeName;}
   
   reflect_Obj(){}
   virtual ~reflect_Obj(){}
@@ -22,27 +22,27 @@ public:
   /// @brief 
   /// @tparam FieldType 
   /// @param fieldName 
-  /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__className没有注册类型为FieldType、名称为fieldName的域
+  /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__typeName没有注册类型为FieldType、名称为fieldName的域
   template <typename FieldType> FieldType* access(std::string const& fieldName);
 
   /// @brief 
   /// @tparam FieldType 
   /// @param fieldName 
-  /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__className没有注册类型为FieldType、名称为fieldName的域
+  /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__typeName没有注册类型为FieldType、名称为fieldName的域
   template <typename FieldType> FieldType const* access(std::string const& fieldName) const;
 
   /// @brief 
   /// @tparam FieldType 
   /// @param fieldName 
   /// @param value 
-  /// @return 1 OK; 0 反射类__className没有注册类型为FieldType、名称为fieldName的域
+  /// @return 1 OK; 0 反射类__typeName没有注册类型为FieldType、名称为fieldName的域
   template <typename FieldType>  int get(std::string const& fieldName, FieldType& value) const;
 
   /// @brief 
   /// @tparam FieldType 
   /// @param fieldName 
   /// @param value 
-  /// @return 1 OK; 0 反射类__className没有注册类型为FieldType、名称为fieldName的域
+  /// @return 1 OK; 0 反射类__typeName没有注册类型为FieldType、名称为fieldName的域
   template <typename FieldType>  int set(std::string const& fieldName, FieldType const& value);
 
   /// @brief 调用有返回值的函数
@@ -51,7 +51,7 @@ public:
   /// @param methodName 
   /// @param result 
   /// @param ...args 
-  /// @return 1 OK; 0 反射类__className没有注册返回值类型为ReturnType、参数列表为ArgTypes...的方法
+  /// @return 1 OK; 0 反射类__typeName没有注册返回值类型为ReturnType、参数列表为ArgTypes...的方法
   template <typename ReturnType, typename ... ArgTypes>
   int func(
     std::string const& methodName,
@@ -63,7 +63,7 @@ public:
   /// @tparam ...ArgTypes 
   /// @param methodName 
   /// @param ...args 
-  /// @return 1 OK; 0 反射类__className没有注册返回值为void、参数列表为ArgTypes...的方法
+  /// @return 1 OK; 0 反射类__typeName没有注册返回值为void、参数列表为ArgTypes...的方法
   template <typename ... ArgTypes>
   int pro(
     std::string const& methodName,

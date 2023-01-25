@@ -5,9 +5,9 @@
 #include "./Foo.hpp"
 
 // for coding
-// #include "reflect/detail/class/normal.hpp" 
-// #include "reflect/detail/class/ClassRegistration.inl"
-// #include "reflect/detail/class/normal.inl"
+// #include "reflect/detail/type/normal.hpp" 
+// #include "reflect/detail/type/TypeRegistration.inl"
+// #include "reflect/detail/type/normal.inl"
 // #include "reflect/detail/field/FieldRegistration.inl"
 // #include "reflect/detail/field/FieldRegistry.inl"
 // #include "reflect/detail/method/MethodRegistration.inl"
