@@ -22,15 +22,15 @@ _reflect_TypeNameRegistration<Type>::_reflect_TypeNameRegistration(std::string c
   reflect_TypeName<Type>::registerOrGet(name);
 }
 
-/// @param _registrationNickname 无意义，仅用于多次注册动作之间的区分
+/// @param _registrationNickname 无意义，仅用于不同注册动作之间的区分
 #define REFLECT_REGISTER_TYPENAME(Type,_registrationNickname)\
-static _reflect_TypeNameRegistration<Type> _reflect_typeNameRegi_##Type##_##_registrationNickname(#Type);
+static _reflect_TypeNameRegistration<Type> _reflect_typeNameRegi_##_registrationNickname(#Type);
 
-/// 为了同时注册多个构造函数，用户需要随便提供一个唯一的_constructorNickname作区分
+/// 因为Type可能带namespace，所以不把它掺入注册动作的静态变量名，静态变量名的区分完全交给_constructorNickname
 #define REFLECT_REGISTER_CONSTRUCTOR(Type, _constructorNickname, ...) \
 REFLECT_REGISTER_TYPENAME(Type, _constructorNickname)\
 static _reflect_TypeRegistration<__VA_ARGS__> \
-  _reflect_typeRegistration_##Type##_##_constructorNickname( \
+  _reflect_typeRegistration_##_constructorNickname( \
     #Type, \
     _reflect_new<Type, ##__VA_ARGS__>, \
     _reflect_make_shared<Type, ##__VA_ARGS__> \

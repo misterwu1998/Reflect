@@ -30,6 +30,14 @@ template <typename T, typename ... Ts> struct TTT{
 };
 #endif
 
+#if 0 //重复给出模板特化是不行的
+template <typename T> class abcd{};
+template <> class abcd<int>{};
+template <> class abcd<int>{
+  void f(){}
+};
+#endif //重复给出模板特化是不行的
+
 int main(int argc, char const *argv[])
 {
   int ret;

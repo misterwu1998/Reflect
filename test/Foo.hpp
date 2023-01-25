@@ -4,6 +4,9 @@
 #include <iostream>
 #include "reflect/single_include.hpp"
 
+REFLECT_REGISTER_TYPENAME(std::vector<int>,vector_int)
+REFLECT_REGISTER_TYPENAME(std::string,string)
+
 class Bar: public reflect_Obj{
 public:
   std::vector<int> v;
@@ -13,8 +16,9 @@ public:
   }
 };
 
-REFLECT_REGISTER_CONSTRUCTOR(Bar,prototype)
-REFLECT_REGISTER_FIELD(Bar,v,std::vector<int>)
+REFLECT_REGISTER_CONSTRUCTOR(Bar,Bar_prototype)
+// REFLECT_REGISTER_FIELD_OLD(Bar,v,std::vector<int>)
+REFLECT_REGISTER_FIELD(Bar,v)
 
 #include "serial/single_include.hpp"
 
@@ -41,13 +45,18 @@ public:
   {return a(id,name);}
 };
 
-REFLECT_REGISTER_CONSTRUCTOR(Foo, prototype)
+REFLECT_REGISTER_CONSTRUCTOR(Foo, Foo_prototype)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, rvInt, int&&)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, crStr, std::string const&)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, both, int, const char*)
-REFLECT_REGISTER_FIELD(Foo,id,int)
-REFLECT_REGISTER_FIELD(Foo,name, std::string)
-REFLECT_REGISTER_FIELD(Foo,bar,Bar)
+
+// REFLECT_REGISTER_FIELD_OLD(Foo,id,int)
+// REFLECT_REGISTER_FIELD_OLD(Foo,name, std::string)
+// REFLECT_REGISTER_FIELD_OLD(Foo,bar,Bar)
+REFLECT_REGISTER_FIELD(Foo,id)
+REFLECT_REGISTER_FIELD(Foo,name)
+REFLECT_REGISTER_FIELD(Foo,bar)
+
 REFLECT_REGISTER_METHOD(Foo,getId,int)
 REFLECT_REGISTER_METHOD(Foo,shout,void,double)
 REFLECT_REGISTER_METHOD(Foo,nothing,void)

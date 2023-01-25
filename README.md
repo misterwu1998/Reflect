@@ -130,10 +130,10 @@ REFLECT_REGISTER_CONSTRUCTOR(Foo, crStr,    std::string const&)
 REFLECT_REGISTER_CONSTRUCTOR(Foo, both,     int, const char*)
 ```
 `昵称`仅用于区分可能被注册的多个构造函数，不能重复；随便起名即可。
-### REFLECT_REGISTER_FIELD(反射类,域,值类型)
+### REFLECT_REGISTER_FIELD_OLD(反射类,域,值类型)
 ```cpp
-REFLECT_REGISTER_FIELD(Foo,id,int)
-REFLECT_REGISTER_FIELD(Foo,name, std::string)
+REFLECT_REGISTER_FIELD_OLD(Foo,id,int)
+REFLECT_REGISTER_FIELD_OLD(Foo,name, std::string)
 ```
 <b>仅支持值类型的成员变量的注册。</b>不要注册类的引用型成员。
 

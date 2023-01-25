@@ -3,23 +3,31 @@
 
 #include <string>
 #include <cstdint>
+#include <iostream>
 
 // 没有注册的类不会有
-template <typename Type> struct reflect_TypeName
+template <typename Type> class reflect_TypeName
 {
+public:
   /// @param other 如果不想重置类名，就不用赋值
   /// @return 
   static std::string const& registerOrGet(std::string const& other = ""){
     static std::string n;
     if(! other.empty())
       n = other;
+    else if(n.empty())//之前没注册过，现在又想获取，这是不行的，直接报错终止进程
+    {
+      std::cerr << "[!] Please ensure that the typename of any reflect_Obj's any field or arg has been registered." << std::endl;
+      exit(0);
+    }
     return n;
   }
 };
 
 #define BASIC_TYPE_NAME_(type) \
-template <> struct reflect_TypeName<type>\
+template <> class reflect_TypeName<type>\
 {\
+public:\
   static std::string const& registerOrGet(std::string const& other = "")\
   {\
     static std::string n(#type);\
