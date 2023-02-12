@@ -7,25 +7,23 @@
 class reflect_Method
 {
 public:
-  
-  void* __functor;//类成员函数的地址，统统擦除掉类型
+  void *__functor; // 类成员函数的地址，统统擦除掉类型
   std::string name;
   std::string argTypeNames;
   std::string retTypeName;
-  reflect_Method() : __functor(NULL){}
-  reflect_Method( void* functor, 
-                  std::string const& name,
-                  std::string const& retTypeName,
-                  std::string const& argTypeNames = "")
-    : __functor(functor), name(name), 
-      retTypeName(retTypeName.empty() ? "void":retTypeName), 
-      argTypeNames(argTypeNames.empty() ? "void":argTypeNames) {}
+  reflect_Method() : __functor(NULL) {}
+  reflect_Method(void *functor,
+                 std::string const &name,
+                 std::string const &retTypeName = "",
+                 std::string const &argTypeNames = "")
+      : __functor(functor), name(name),
+        retTypeName(retTypeName.empty() ? "void" : retTypeName),
+        argTypeNames(argTypeNames.empty() ? "void" : argTypeNames) {}
 
-  inline void* getFunctor() const {return __functor;}
-  inline std::string getName() const{ return name;}
-  inline std::string getRetTypeName() const{return retTypeName;}
-  inline std::string getArgTypeNames() const{ return argTypeNames;}
-
+  inline void *getFunctor() const { return __functor; }
+  inline std::string const &getName() const { return name; }
+  inline std::string const &getRetTypeName() const { return retTypeName; }
+  inline std::string const &getArgTypeNames() const { return argTypeNames; }
 };
 
 #endif // __reflect_Method_hpp

@@ -5,20 +5,18 @@
 
 class reflect_Obj;
 
-template <typename Class, typename ...ArgTypes>
-inline reflect_Obj* _reflect_new(ArgTypes... args)
+template <typename Class, typename... ArgTypes>
+inline reflect_Obj *_reflect_new(ArgTypes... args)
 {
   return new Class(std::forward<ArgTypes>(args)...);
 }
 
-template <typename Class, typename ...ArgTypes>
+template <typename Class, typename... ArgTypes>
 inline std::shared_ptr<reflect_Obj> _reflect_make_shared(ArgTypes... args)
 {
-  return std::static_pointer_cast<reflect_Obj,Class>(
-    std::make_shared<Class>(
-      std::forward<ArgTypes>(args)...
-    )
-  );
+  return std::static_pointer_cast<reflect_Obj, Class>(
+      std::make_shared<Class>(
+          std::forward<ArgTypes>(args)...));
 }
 
 #endif // _reflect_Constructor_hpp

@@ -24,13 +24,19 @@ int _reflect_FieldRegistry<FieldType>::get(
   auto& fields = getMap();
   auto itc = fields.find(className);
   if(fields.end()==itc)
-    return 0;
+  {
+    return -1;
+  }
+
   auto& c = itc->second;
   auto itf = c.find(fieldName);
   if(c.end()==itf)
-    return 0;
+  {
+    return -2;
+  }
+
   field = itf->second;
-  return 1;
+  return 0;
 }
 
 #endif // _reflect_FieldRegistry_inl

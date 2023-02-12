@@ -12,7 +12,7 @@ template <typename T,
 inline int toJSON_basic_or_reflectObj(T const &obj, reflect_JSON &jsonValue)
 {
   // 确保携带着类名
-  const_cast<T &>(obj)._pClassNameSingleton = &(reflect_ClassName<T>::registerOrGet());
+  const_cast<T &>(obj)._p_singleton_className = &(reflect_ClassName<T>::registerOrGet());
 
   return obj.toJSON(jsonValue);
 }
@@ -22,7 +22,7 @@ template <typename T,
 inline int toJSON_basic_or_reflectObj(T const &obj, reflect_JSON &jsonValue)
 {
   jsonValue = obj;
-  return 1;
+  return 0;
 }
 
 template <typename T,
@@ -32,7 +32,7 @@ template <typename T,
 inline int fromJSON_basic_or_reflectObj(reflect_JSON const &jsonValue, T &obj)
 {
   // 确保携带着类名
-  (obj)._pClassNameSingleton = &(reflect_ClassName<T>::registerOrGet());
+  (obj)._p_singleton_className = &(reflect_ClassName<T>::registerOrGet());
 
   return obj.fromJSON(jsonValue);
 }
@@ -42,7 +42,7 @@ template <typename T,
 inline int fromJSON_basic_or_reflectObj(reflect_JSON const &jsonValue, T &obj)
 {
   jsonValue.get_to(obj);
-  return 1;
+  return 0;
 }
 
 #endif // _reflect_dispatch_inl

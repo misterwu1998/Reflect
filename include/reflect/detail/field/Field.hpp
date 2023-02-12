@@ -7,30 +7,28 @@
 
 /// @brief 域的类型无关的属性，即，无论什么类的什么类型的域，都会有这里定义的属性。
 class reflect_Field
-{ 
+{
 public:
-  
   unsigned int offset;
   unsigned int size;
   std::string name;
   std::string typeName;
-  int (*toJSON)(void const*, reflect_JSON&);/// @return 1 OK; 0 fail
-  int (*fromJSON)(reflect_JSON const&, void*);/// @return 1 OK; 0 fail
- 
-  reflect_Field(  unsigned int offset, 
-                  unsigned int size, 
-                  std::string const& name,
-                  std::string const& typeName,
-                  int (*toJSON)(void const*, reflect_JSON&),
-                  int (*fromJSON)(reflect_JSON const&, void*)) 
-    : offset(offset), size(size), name(name), typeName(typeName), toJSON(toJSON), fromJSON(fromJSON) {}
-  reflect_Field(){}
+  int (*toJSON)(void const *, reflect_JSON &);   /// @return negative -- fail; non-negative -- OK
+  int (*fromJSON)(reflect_JSON const &, void *); /// @return negative -- fail; non-negative -- OK
 
-  inline unsigned int getOffset() const{return offset;}
-  inline unsigned int getSize() const{return size;}
-  inline std::string getName() const{return name;}
-  inline std::string getTypeName() const{return typeName;}
-  
+  reflect_Field(unsigned int offset,
+                unsigned int size,
+                std::string const &name,
+                std::string const &typeName,
+                int (*toJSON)(void const *, reflect_JSON &),
+                int (*fromJSON)(reflect_JSON const &, void *))
+      : offset(offset), size(size), name(name), typeName(typeName), toJSON(toJSON), fromJSON(fromJSON) {}
+  reflect_Field() {}
+
+  inline unsigned int getOffset() const { return offset; }
+  inline unsigned int getSize() const { return size; }
+  inline std::string const &getName() const { return name; }
+  inline std::string const &getTypeName() const { return typeName; }
 };
 
 #endif // _reflect_Field_hpp

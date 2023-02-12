@@ -3,15 +3,14 @@
 
 class reflect_Method;
 
-template <typename ReturnType, typename ... ArgTypes>
+template <typename ReturnType, typename... ArgTypes>
 class _reflect_MethodRegistration
 {
 public:
   _reflect_MethodRegistration(
-    std::string const& className,
-    std::string const& methodName,
-    reflect_Method const& method
-  );
+      std::string const &className,
+      std::string const &methodName,
+      reflect_Method const &method);
 };
 
 #if 0 // for coding
@@ -59,7 +58,7 @@ static _reflect_MethodRegistration<
 
 #endif // _reflect_MethodRegistration_hpp
 
-#if 0 //example
+#if 0 // example
 struct Foo{
   char get(){}
   void nothing(){}

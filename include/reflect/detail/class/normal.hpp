@@ -65,7 +65,8 @@ public:
       std::string const &fieldName,
       reflect_Field const &field);
 
-  /// @return 1 OK; 0 fail
+  /// @return -1 -- class unregistered;
+  //          -2 -- field unregistered
   static int get(
       std::string const &className,
       std::string const &fieldName,
@@ -73,7 +74,8 @@ public:
 
   /// @brief
   /// @param className
-  /// @return std::unordered_map<std::string/*域名*/,reflect_Field> const*; NULL表示className所指的类未注册任何域
+  /// @return std::unordered_map<std::string/*域名*/,reflect_Field> const*; 
+  //          NULL -- className所指的类未注册任何域
   static std::unordered_map<
       std::string /*域名*/,
       reflect_Field> const *
@@ -90,7 +92,8 @@ public:
       std::string const &methodName,
       reflect_Method const &method);
 
-  /// @return 1 OK; 0 fail
+  /// @return -1 -- class unregistered;
+  //          -2 -- method unregistered
   static int get(
       std::string const &className,
       std::string const &methodName,
@@ -98,7 +101,8 @@ public:
 
   /// @brief
   /// @param className
-  /// @return std::unordered_map<std::string/*域名*/,reflect_Method> const*; NULL表示className所指的类未注册任何方法
+  /// @return std::unordered_map<std::string/*域名*/,reflect_Method> const*; 
+  //          NULL -- className所指的类未注册任何方法
   static std::unordered_map<
       std::string /*方法名*/,
       reflect_Method> const *

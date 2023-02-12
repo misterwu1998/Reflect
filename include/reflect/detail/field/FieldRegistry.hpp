@@ -11,38 +11,37 @@ template <typename FieldType>
 class _reflect_FieldRegistry
 {
   static std::unordered_map<
-    std::string/*类名*/,
-    std::unordered_map<
-      std::string/*域名*/,
-      reflect_Field>>& getMap()
+      std::string /*类名*/,
+      std::unordered_map<
+          std::string /*域名*/,
+          reflect_Field>> &
+  getMap()
   {
     static std::unordered_map<
-      std::string/*类名*/,
-      std::unordered_map<
-        std::string/*域名*/,
-        reflect_Field>> fields;
+        std::string /*类名*/,
+        std::unordered_map<
+            std::string /*域名*/,
+            reflect_Field>>
+        fields;
     return fields;
   }
 
 public:
-
   static void set(
-    std::string const& className,
-    std::string const& fieldName,
-    reflect_Field const& field
-  );
+      std::string const &className,
+      std::string const &fieldName,
+      reflect_Field const &field);
 
-  /// @brief 
-  /// @param className 
-  /// @param fieldName 
+  /// @brief
+  /// @param className
+  /// @param fieldName
   /// @param field [out]
-  /// @return 1 有; 0 没有
+  /// @return -1 -- class unregistered;
+  //          -2 -- field unregistered
   static int get(
-    std::string const& className,
-    std::string const& fieldName,
-    reflect_Field& field);
-
+      std::string const &className,
+      std::string const &fieldName,
+      reflect_Field &field);
 };
-
 
 #endif // _reflect_FieldRegistry_hpp
