@@ -13,11 +13,21 @@ class reflect_Obj
 public:
 
   /// @brief 只要是借助反射机制动态获取的对象，这一字符串用于记录实际类名
-  std::string __className;
-  std::string getClassName() const{return __className;}
+  /// @warning Never handle it!
+  char* __className;
+  char const* getClassName() const{return __className;}
   
-  reflect_Obj(){}
-  virtual ~reflect_Obj(){}
+  reflect_Obj()
+    : __className(NULL)
+  {}
+
+  virtual ~reflect_Obj()
+  {
+    if(NULL!=__className)
+    {
+      free(__className);
+    }
+  }
 
   /// @brief 
   /// @tparam FieldType 

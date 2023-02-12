@@ -10,7 +10,16 @@ template <typename T,
                        std::is_base_of<reflect_Obj,T>::value> p>
 inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
 {
-  const_cast<T&>(obj).__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
+  //确保携带着类名
+  auto& pName = const_cast<T&>(obj).__className;
+  if(NULL==pName)
+  {
+    auto& name = reflect_ClassName<T>::registerOrGet();
+    pName = (char*)malloc(name.length()+1);
+    memcpy(pName, name.data(), name.length());
+    pName[ name.length() ] = 0;
+  }
+
   return obj.toJSON(jsonValue);
 }
 
@@ -27,7 +36,16 @@ template <typename T,
                        std::is_base_of<reflect_Obj,T>::value> p>
 inline int fromJSON_basic_or_reflectObj(reflect_JSON const& jsonValue, T& obj)
 {
-  obj.__className = reflect_ClassName<T>::registerOrGet();//确保携带着类名
+  //确保携带着类名
+  auto& pName = obj.__className;
+  if(NULL==p)
+  {
+    auto& name = reflect_ClassName<T>::registerOrGet();
+    pName = (char*)malloc(name.length()+1);
+    memcpy(pName, name.data(), name.length());
+    pName[ name.length() ] = 0;
+  }
+  
   return obj.fromJSON(jsonValue);
 }
 

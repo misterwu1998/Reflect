@@ -160,21 +160,28 @@ inline reflect_Obj* reflect_new(
   auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get_new(className);
   if(f){
     reflect_Obj* obj = f(std::forward<ConstructorArgTypes>(args)...);
-    obj->__className = className;
+    
+    // 是通过反射得到的，要带上类名
+    obj->__className = (char*)malloc(className.length()+1);
+    memcpy(obj->__className,
+           className.data(),
+           className.length());
+    obj->__className[ className.length() ] = 0;
+
     return obj;
   }
   return NULL;
 }
 
-template <typename ... ConstructorArgTypes>
-inline reflect_Obj* reflect_new(
-  const char* className,
-  ConstructorArgTypes... args
-){
-  return reflect_new<ConstructorArgTypes...>(
-    std::string(className), 
-    std::forward<ConstructorArgTypes>(args)...);
-}
+// template <typename ... ConstructorArgTypes>
+// inline reflect_Obj* reflect_new(
+//   const char* className,
+//   ConstructorArgTypes... args
+// ){
+//   return reflect_new<ConstructorArgTypes...>(
+//     std::string(className), 
+//     std::forward<ConstructorArgTypes>(args)...);
+// }
 
 template <typename ... ConstructorArgTypes>
 inline reflect_Ptr reflect_share(
@@ -184,20 +191,27 @@ inline reflect_Ptr reflect_share(
   auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get_make_shared(className);
   if(f){
     reflect_Ptr obj = f(std::forward<ConstructorArgTypes>(args)...);
-    obj->__className = className;
+    
+    // 是通过反射得到的，要带上类名
+    obj->__className = (char*)malloc(className.length()+1);
+    memcpy(obj->__className,
+           className.data(),
+           className.length());
+    obj->__className[ className.length() ] = 0;
+
     return obj;
   }
   return nullptr;
 }
 
-template <typename ... ConstructorArgTypes>
-inline reflect_Ptr reflect_share(
-  const char* className,
-  ConstructorArgTypes... args
-){
-  return reflect_share<ConstructorArgTypes...>(
-    std::string(className), 
-    std::forward<ConstructorArgTypes>(args)...);
-}
+// template <typename ... ConstructorArgTypes>
+// inline reflect_Ptr reflect_share(
+//   const char* className,
+//   ConstructorArgTypes... args
+// ){
+//   return reflect_share<ConstructorArgTypes...>(
+//     std::string(className), 
+//     std::forward<ConstructorArgTypes>(args)...);
+// }
 
 #endif // _reflect_Obj_inl
