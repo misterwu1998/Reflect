@@ -5,27 +5,21 @@
 
 #include "reflect/detail/class/ClassName.hpp"
 
-template <typename T, 
+template <typename T,
           EnableIf_ptr<HasMemberFunction_toJSON<T>::result &&
-                       std::is_base_of<reflect_Obj,T>::value> p>
-inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
+                       std::is_base_of<reflect_Obj, T>::value>
+              p>
+inline int toJSON_basic_or_reflectObj(T const &obj, reflect_JSON &jsonValue)
 {
-  //确保携带着类名
-  auto& pName = const_cast<T&>(obj).__className;
-  if(NULL==pName)
-  {
-    auto& name = reflect_ClassName<T>::registerOrGet();
-    pName = (char*)malloc(name.length()+1);
-    memcpy(pName, name.data(), name.length());
-    pName[ name.length() ] = 0;
-  }
+  // 确保携带着类名
+  const_cast<T &>(obj)._pClassNameSingleton = &(reflect_ClassName<T>::registerOrGet());
 
   return obj.toJSON(jsonValue);
 }
 
 template <typename T,
-          EnableIf_ptr<! HasMemberFunction_toJSON<T>::result> p>
-inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
+          EnableIf_ptr<!HasMemberFunction_toJSON<T>::result> p>
+inline int toJSON_basic_or_reflectObj(T const &obj, reflect_JSON &jsonValue)
 {
   jsonValue = obj;
   return 1;
@@ -33,25 +27,19 @@ inline int toJSON_basic_or_reflectObj(T const& obj, reflect_JSON& jsonValue)
 
 template <typename T,
           EnableIf_ptr<HasMemberFunction_fromJSON<T>::result &&
-                       std::is_base_of<reflect_Obj,T>::value> p>
-inline int fromJSON_basic_or_reflectObj(reflect_JSON const& jsonValue, T& obj)
+                       std::is_base_of<reflect_Obj, T>::value>
+              p>
+inline int fromJSON_basic_or_reflectObj(reflect_JSON const &jsonValue, T &obj)
 {
-  //确保携带着类名
-  auto& pName = obj.__className;
-  if(NULL==p)
-  {
-    auto& name = reflect_ClassName<T>::registerOrGet();
-    pName = (char*)malloc(name.length()+1);
-    memcpy(pName, name.data(), name.length());
-    pName[ name.length() ] = 0;
-  }
-  
+  // 确保携带着类名
+  (obj)._pClassNameSingleton = &(reflect_ClassName<T>::registerOrGet());
+
   return obj.fromJSON(jsonValue);
 }
 
 template <typename T,
-          EnableIf_ptr<! HasMemberFunction_fromJSON<T>::result> p>
-inline int fromJSON_basic_or_reflectObj(reflect_JSON const& jsonValue, T& obj)
+          EnableIf_ptr<!HasMemberFunction_fromJSON<T>::result> p>
+inline int fromJSON_basic_or_reflectObj(reflect_JSON const &jsonValue, T &obj)
 {
   jsonValue.get_to(obj);
   return 1;

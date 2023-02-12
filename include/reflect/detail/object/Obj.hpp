@@ -11,93 +11,92 @@ class reflect_Method;
 class reflect_Obj
 {
 public:
-
   /// @brief 只要是借助反射机制动态获取的对象，这一字符串用于记录实际类名
   /// @warning Never handle it!
-  char* __className;
-  char const* getClassName() const{return __className;}
-  
+  std::string const *_pClassNameSingleton;
+  std::string getClassName() { return (_pClassNameSingleton == NULL) ? ("") : (*_pClassNameSingleton); }
+
   reflect_Obj()
-    : __className(NULL)
-  {}
+      : _pClassNameSingleton(NULL)
+  {
+  }
 
   virtual ~reflect_Obj()
   {
-    if(NULL!=__className)
-    {
-      free(__className);
-    }
   }
 
-  /// @brief 
-  /// @tparam FieldType 
-  /// @param fieldName 
+  /// @brief
+  /// @tparam FieldType
+  /// @param fieldName
   /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__className没有注册类型为FieldType、名称为fieldName的域
-  template <typename FieldType> FieldType* access(std::string const& fieldName);
+  template <typename FieldType>
+  FieldType *access(std::string const &fieldName);
 
-  /// @brief 
-  /// @tparam FieldType 
-  /// @param fieldName 
+  /// @brief
+  /// @tparam FieldType
+  /// @param fieldName
   /// @return 类型为FieldType、名为fieldName的成员变量的指针; NULL 反射类__className没有注册类型为FieldType、名称为fieldName的域
-  template <typename FieldType> FieldType const* access(std::string const& fieldName) const;
+  template <typename FieldType>
+  FieldType const *access(std::string const &fieldName) const;
 
-  /// @brief 
-  /// @tparam FieldType 
-  /// @param fieldName 
-  /// @param value 
+  /// @brief
+  /// @tparam FieldType
+  /// @param fieldName
+  /// @param value
   /// @return 1 OK; 0 反射类__className没有注册类型为FieldType、名称为fieldName的域
-  template <typename FieldType>  int get(std::string const& fieldName, FieldType& value) const;
+  template <typename FieldType>
+  int get(std::string const &fieldName, FieldType &value) const;
 
-  /// @brief 
-  /// @tparam FieldType 
-  /// @param fieldName 
-  /// @param value 
+  /// @brief
+  /// @tparam FieldType
+  /// @param fieldName
+  /// @param value
   /// @return 1 OK; 0 反射类__className没有注册类型为FieldType、名称为fieldName的域
-  template <typename FieldType>  int set(std::string const& fieldName, FieldType const& value);
+  template <typename FieldType>
+  int set(std::string const &fieldName, FieldType const &value);
 
   /// @brief 调用有返回值的函数
-  /// @tparam ReturnType 
-  /// @tparam ...ArgTypes 
-  /// @param methodName 
-  /// @param result 
-  /// @param ...args 
+  /// @tparam ReturnType
+  /// @tparam ...ArgTypes
+  /// @param methodName
+  /// @param result
+  /// @param ...args
   /// @return 1 OK; 0 反射类__className没有注册返回值类型为ReturnType、参数列表为ArgTypes...的方法
-  template <typename ReturnType, typename ... ArgTypes>
+  template <typename ReturnType, typename... ArgTypes>
   int func(
-    std::string const& methodName,
-    ReturnType& result,
-    ArgTypes... args
-  );
+      std::string const &methodName,
+      ReturnType &result,
+      ArgTypes... args);
 
   /// @brief 调用无返回值的过程
-  /// @tparam ...ArgTypes 
-  /// @param methodName 
-  /// @param ...args 
+  /// @tparam ...ArgTypes
+  /// @param methodName
+  /// @param ...args
   /// @return 1 OK; 0 反射类__className没有注册返回值为void、参数列表为ArgTypes...的方法
-  template <typename ... ArgTypes>
+  template <typename... ArgTypes>
   int pro(
-    std::string const& methodName,
-    ArgTypes... args
-  );
+      std::string const &methodName,
+      ArgTypes... args);
 
   std::unordered_map<
-    std::string/*域名*/,
-    reflect_Field> const* getFields() const;
-  
+      std::string /*域名*/,
+      reflect_Field> const *
+  getFields() const;
+
   std::unordered_map<
-    std::string/*方法名*/,
-    reflect_Method> const* getMethods() const;
-    
-  /// @brief 
-  /// @param json 
-  /// @return 1 OK; 0 fail
-  int toJSON(reflect_JSON& json) const;
+      std::string /*方法名*/,
+      reflect_Method> const *
+  getMethods() const;
 
-  /// @brief 
-  /// @param json 
+  /// @brief
+  /// @param json
   /// @return 1 OK; 0 fail
-  int fromJSON(reflect_JSON const& json);
+  int toJSON(reflect_JSON &json) const;
 
+  /// @brief
+  /// @param json
+  /// @return 1 OK; 0 fail
+  int fromJSON(reflect_JSON const &json);
 };
 
 using reflect_Ptr = std::shared_ptr<reflect_Obj>;

@@ -11,207 +11,259 @@
 #include "reflect/detail/json/JSON_decl.hpp"
 
 template <typename FieldType>
-FieldType* reflect_Obj::access(std::string const& fieldName){
-  reflect_Field f;
-  if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
-    return (
-      (FieldType*)
-      (
-        ((void*)this) +
-        f.offset
-      )
-    );
-  else return NULL;
-}
-
-template <typename FieldType>
-FieldType const* reflect_Obj::access(std::string const& fieldName) const{
-  reflect_Field f;
-  if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
-    return (
-      (FieldType const*)
-      (
-        ((void const*)this) +
-        f.offset
-      )
-    );
-  else return NULL;
-}
-
-template <typename FieldType>
-int reflect_Obj::get(std::string const& fieldName, FieldType& value) const
+FieldType *reflect_Obj::access(std::string const &fieldName)
 {
+  if (NULL == _pClassNameSingleton)
+  {
+    return NULL;
+  }
+
   reflect_Field f;
-  if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
+  if (_reflect_FieldRegistry<FieldType>::get(*_pClassNameSingleton, fieldName, f)) // 有
+    return (
+        (FieldType *)(((void *)this) +
+                      f.offset));
+  else
+    return NULL;
+}
+
+template <typename FieldType>
+FieldType const *reflect_Obj::access(std::string const &fieldName) const
+{
+  if (NULL == _pClassNameSingleton)
+  {
+    return NULL;
+  }
+
+  reflect_Field f;
+  if (_reflect_FieldRegistry<FieldType>::get(*_pClassNameSingleton, fieldName, f)) // 有
+    return (
+        (FieldType const *)(((void const *)this) +
+                            f.offset));
+  else
+    return NULL;
+}
+
+template <typename FieldType>
+int reflect_Obj::get(std::string const &fieldName, FieldType &value) const
+{
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
+  reflect_Field f;
+  if (_reflect_FieldRegistry<FieldType>::get(*_pClassNameSingleton, fieldName, f)) // 有
   {
     value = *(
-      (FieldType const*)
-      (
-        ((void*)this) +
-        f.offset
-      )
-    );
+        (FieldType const *)(((void *)this) +
+                            f.offset));
     return 1;
   }
-  else return 0;
+  else
+    return 0;
 }
 
 template <typename FieldType>
-int reflect_Obj::set(std::string const& fieldName, FieldType const& value)
+int reflect_Obj::set(std::string const &fieldName, FieldType const &value)
 {
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
   reflect_Field f;
-  if(_reflect_FieldRegistry<FieldType>::get(__className,fieldName,f))//有
+  if (_reflect_FieldRegistry<FieldType>::get(*_pClassNameSingleton, fieldName, f)) // 有
   {
     *(
-      (FieldType*)
-      (
-        ((void*)this) +
-        f.offset
-      )
-    ) = value;
+        (FieldType *)(((void *)this) +
+                      f.offset)) = value;
     return 1;
   }
-  else return 0;
+  else
+    return 0;
 }
 
-template <typename ReturnType, typename ... ArgTypes>
+template <typename ReturnType, typename... ArgTypes>
 int reflect_Obj::func(
-  std::string const& methodName,
-  ReturnType& result,
-  ArgTypes... args
-){
-  using Func = ReturnType (*)(reflect_Obj* const, ArgTypes...);
+    std::string const &methodName,
+    ReturnType &result,
+    ArgTypes... args)
+{
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
+  using Func = ReturnType (*)(reflect_Obj *const, ArgTypes...);
   reflect_Method m;
-  if(_reflect_MethodRegistry<ReturnType, ArgTypes...>::get(__className,methodName,m))//有
+  if (_reflect_MethodRegistry<ReturnType, ArgTypes...>::get(*_pClassNameSingleton, methodName, m)) // 有
   {
     auto f = (Func)m.getFunctor();
     result = f(this, std::forward<ArgTypes>(args)...);
     return 1;
   }
-  else return 0;
+  else
+    return 0;
 }
 
-template <typename ... ArgTypes>
+template <typename... ArgTypes>
 int reflect_Obj::pro(
-  std::string const& methodName,
-  ArgTypes... args
-){
-  using Func = void (*)(reflect_Obj* const, ArgTypes...);
+    std::string const &methodName,
+    ArgTypes... args)
+{
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
+  using Func = void (*)(reflect_Obj *const, ArgTypes...);
   reflect_Method m;
-  if(_reflect_MethodRegistry<void, ArgTypes...>::get(__className,methodName,m))//有
+  if (_reflect_MethodRegistry<void, ArgTypes...>::get(*_pClassNameSingleton, methodName, m)) // 有
   {
     auto f = (Func)m.getFunctor();
     f(this, std::forward<ArgTypes>(args)...);
     return 1;
   }
-  else return 0;
+  else
+    return 0;
 }
 
 std::unordered_map<
-  std::string/*域名*/,
-  reflect_Field> const* reflect_Obj::getFields() const
+    std::string /*域名*/,
+    reflect_Field> const *
+reflect_Obj::getFields() const
 {
-  return _reflect_normalRegistry::getFields(__className);
+  if (NULL == _pClassNameSingleton)
+  {
+    return NULL;
+  }
+
+  return _reflect_normalRegistry::getFields(*_pClassNameSingleton);
 }
 
 std::unordered_map<
-  std::string/*方法名*/,
-  reflect_Method> const* reflect_Obj::getMethods() const
+    std::string /*方法名*/,
+    reflect_Method> const *
+reflect_Obj::getMethods() const
 {
-  return _reflect_normalRegistry::getMethods(__className);
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
+  return _reflect_normalRegistry::getMethods(*_pClassNameSingleton);
 }
 
-int reflect_Obj::toJSON(reflect_JSON& json) const{
-  int (*f)(void const*, reflect_JSON&);
+int reflect_Obj::toJSON(reflect_JSON &json) const
+{
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
+  int (*f)(void const *, reflect_JSON &);
   int ret;
   auto fields = getFields();
-  for(auto& kv: *fields){
-    auto& field = kv.second;
+  if (NULL == fields)
+  {
+    return 0;
+  }
+
+  for (auto &kv : *fields)
+  {
+    auto &field = kv.second;
     f = field.toJSON;
-    if(f(((void const*)this) + field.offset, json[field.name])){}
-    else return 0;// fail
+    if (f(((void const *)this) + field.offset, json[field.name]))
+    {
+    }
+    else
+      return 0; // fail
   }
   return 1;
 }
 
-int reflect_Obj::fromJSON(reflect_JSON const& json){
-  int (*f)(reflect_JSON const&, void*);
+int reflect_Obj::fromJSON(reflect_JSON const &json)
+{
+  if (NULL == _pClassNameSingleton)
+  {
+    return 0;
+  }
+
+  int (*f)(reflect_JSON const &, void *);
   int ret;
   auto fields = getFields();
-  for(auto& kv: *fields){
-    auto& field = kv.second;
-    if(json.contains(field.name)){}
-    else return 0;
+  if (NULL == fields)
+  {
+    return 0;
+  }
+
+  for (auto &kv : *fields)
+  {
+    auto &field = kv.second;
+    if (json.contains(field.name))
+    {
+    }
+    else
+      return 0;
     f = field.fromJSON;
-    if(f(json[field.name], ((void*)this) + field.offset)){}
-    else return 0;
+    if (f(json[field.name], ((void *)this) + field.offset))
+    {
+    }
+    else
+      return 0;
   }
   return 1;
 }
 
-#define REFLECT_ACCESS(pointer_or_sharedPtr, fieldName, type)\
-(pointer_or_sharedPtr ? pointer_or_sharedPtr->access<type>(fieldName) : ((type*)NULL))
+#define REFLECT_ACCESS(pointer_or_sharedPtr, fieldName, type) \
+  (pointer_or_sharedPtr ? pointer_or_sharedPtr->access<type>(fieldName) : ((type *)NULL))
 
-template <typename ... ConstructorArgTypes>
-inline reflect_Obj* reflect_new(
-  std::string const& className,
-  ConstructorArgTypes... args
-){
+template <typename... ConstructorArgTypes>
+inline reflect_Obj *reflect_new(
+    std::string const &className,
+    ConstructorArgTypes... args)
+{
   auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get_new(className);
-  if(f){
-    reflect_Obj* obj = f(std::forward<ConstructorArgTypes>(args)...);
-    
-    // 是通过反射得到的，要带上类名
-    obj->__className = (char*)malloc(className.length()+1);
-    memcpy(obj->__className,
-           className.data(),
-           className.length());
-    obj->__className[ className.length() ] = 0;
-
-    return obj;
+  if (NULL == f)
+  {
+    return NULL;
   }
-  return NULL;
+
+  reflect_Obj *obj = f(std::forward<ConstructorArgTypes>(args)...);
+
+  // 是通过反射得到的，要带上类名
+  obj->_pClassNameSingleton = _reflect_normalRegistry::get(className);
+  if (NULL == obj->_pClassNameSingleton)
+  {
+    delete obj;
+    return NULL;
+  }
+
+  return obj;
 }
 
-// template <typename ... ConstructorArgTypes>
-// inline reflect_Obj* reflect_new(
-//   const char* className,
-//   ConstructorArgTypes... args
-// ){
-//   return reflect_new<ConstructorArgTypes...>(
-//     std::string(className), 
-//     std::forward<ConstructorArgTypes>(args)...);
-// }
-
-template <typename ... ConstructorArgTypes>
+template <typename... ConstructorArgTypes>
 inline reflect_Ptr reflect_share(
-  std::string const& className,
-  ConstructorArgTypes... args
-){
+    std::string const &className,
+    ConstructorArgTypes... args)
+{
   auto f = _reflect_ClassRegistry<ConstructorArgTypes...>::get_make_shared(className);
-  if(f){
-    reflect_Ptr obj = f(std::forward<ConstructorArgTypes>(args)...);
-    
-    // 是通过反射得到的，要带上类名
-    obj->__className = (char*)malloc(className.length()+1);
-    memcpy(obj->__className,
-           className.data(),
-           className.length());
-    obj->__className[ className.length() ] = 0;
-
-    return obj;
+  if (NULL == f)
+  {
+    return nullptr;
   }
-  return nullptr;
-}
 
-// template <typename ... ConstructorArgTypes>
-// inline reflect_Ptr reflect_share(
-//   const char* className,
-//   ConstructorArgTypes... args
-// ){
-//   return reflect_share<ConstructorArgTypes...>(
-//     std::string(className), 
-//     std::forward<ConstructorArgTypes>(args)...);
-// }
+  reflect_Ptr obj = f(std::forward<ConstructorArgTypes>(args)...);
+
+  // 是通过反射得到的，要带上类名
+  obj->_pClassNameSingleton = _reflect_normalRegistry::get(className);
+  if (NULL == obj->_pClassNameSingleton)
+  {
+    obj = nullptr;
+  }
+
+  return obj;
+}
 
 #endif // _reflect_Obj_inl
